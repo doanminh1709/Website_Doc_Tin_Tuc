@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface NewsRepository extends JpaRepository<News, Integer> {
-    Boolean existsByNewsName(String newsName);
+    Boolean existsByTitle(String title);
 
     @Query(value = "SELECT  u.id , u.title , u.description , u.thumbnail FROM News u ORDER BY u.view DESC LIMIT 5" , nativeQuery = true)
     List<News> favoriteNews();

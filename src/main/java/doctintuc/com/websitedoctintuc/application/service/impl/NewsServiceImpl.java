@@ -28,12 +28,11 @@ public class NewsServiceImpl implements INewsService {
 
     @Override
     public News create(NewsDTO newsDTO) {
-        if (newsRepository.existsByNewsName(newsDTO.getNewsName())) {
-            throw new VsException(DevMessageConstant.Common.DUPLICATE_NAME, newsDTO.getNewsName());
+        if (newsRepository.existsByTitle(newsDTO.getTitle())) {
+            throw new VsException(DevMessageConstant.Common.DUPLICATE_NAME, newsDTO.getTitle());
         }
         try {
             News news = modelMapper.map(newsDTO, News.class);
-            news.setThumbnail(cloudinary.getUrlFromFile(newsDTO.getThumbnail()));
             news.setView(0);
             return newsRepository.save(news);
         } catch (Exception e) {
@@ -56,18 +55,15 @@ public class NewsServiceImpl implements INewsService {
 
         Optional<News> foundNews = newsRepository.findById(id);
         if (foundNews.isPresent()) {
-            if (newsRepository.existsByNewsName(newsDTO.getNewsName())) {
-                throw new VsException(DevMessageConstant.Common.DUPLICATE_NAME, newsDTO.getNewsName());
+            if (newsRepository.existsByTitle(newsDTO.getTitle())) {
+                throw new VsException(DevMessageConstant.Common.DUPLICATE_NAME, newsDTO.getTitle());
             }
             try {
                 News news = modelMapper.map(newsDTO, News.class);
-                news.setThumbnail(cloudinary.getUrlFromFile(newsDTO.getThumbnail()));
-                news.setCreateBy(foundNews.get().getCreateBy());
                 return newsRepository.save(news);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-
         } else {
             throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID,
                     CommonConstant.ClassName.NEWS_CLASS_NAME, id));

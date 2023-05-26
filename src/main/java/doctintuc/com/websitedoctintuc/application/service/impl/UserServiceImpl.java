@@ -9,7 +9,6 @@ import doctintuc.com.websitedoctintuc.application.repository.UserRepository;
 import doctintuc.com.websitedoctintuc.application.response.UserResponse;
 import doctintuc.com.websitedoctintuc.application.service.IUserService;
 import doctintuc.com.websitedoctintuc.application.service.user_detail.UserDetailImp;
-import doctintuc.com.websitedoctintuc.application.utils.UploadCloudinary;
 import doctintuc.com.websitedoctintuc.config.exception.VsException;
 import doctintuc.com.websitedoctintuc.domain.dto.UserDTO;
 import doctintuc.com.websitedoctintuc.domain.entity.User;
@@ -36,13 +35,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-//@RequiredArgsConstructor
 @AllArgsConstructor
 public class UserServiceImpl implements IUserService {
-
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     private final UserRepository userRepository;
-    private final UploadCloudinary cloudinary;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
     private final RoleRepository roleRepository;
@@ -60,7 +56,6 @@ public class UserServiceImpl implements IUserService {
             if (accountDTO.getBirthday() != null) {
                 birthday = sdf.parse(accountDTO.getBirthday());
             }
-            String linkImg = cloudinary.getUrlFromFile(accountDTO.getAvatar());
             User account = new User();
             account.setEmail(accountDTO.getEmail());
             account.setGender(accountDTO.getGender());
@@ -68,7 +63,7 @@ public class UserServiceImpl implements IUserService {
             account.setFullName(accountDTO.getFullName());
             account.setUsername(accountDTO.getUsername());
             account.setPhone(accountDTO.getPhone());
-
+            account.setAvatar(accountDTO.getAvatar());
 //            PropertyMap<UserDTO, User> userMap = new PropertyMap<>() {
 //                @Override
 //                protected void configure() {
@@ -83,7 +78,6 @@ public class UserServiceImpl implements IUserService {
 //            modelMapper.addMappings(userMap);
 //            account = modelMapper.map(accountDTO, User.class);
             account.setBirthday(birthday);
-            account.setAvatar(linkImg);
             account.setCreateBy(CommonConstant.ROLE_SUPER_ADMIN);
             account.setLastModifiedBy(CommonConstant.ROLE_SUPER_ADMIN);
             account.setPassword(passwordEncoder.encode(accountDTO.getPassword()));
@@ -109,36 +103,32 @@ public class UserServiceImpl implements IUserService {
     @Override
     public User update(int id, UserDTO accountDTO) {
         if (!userRepository.existsById(id)) {
-            throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID, User.class.getName(), id));
+            throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID,
+                    CommonConstant.ClassName.USER_CLASS_NAME, id));
         } else {
             Optional<User> findAccount = userRepository.findById(id);
-            String linkUrl = null;
-            if (accountDTO.getAvatar().getOriginalFilename() == null) {
-                linkUrl = findAccount.get().getAvatar();
-            }
             if (findAccount.get().getUsername().equals(accountDTO.getUsername()) ||
                     !userRepository.existsByUsername(accountDTO.getUsername())) {
 
                 Date birthday = null;
-
                 try {
                     if (accountDTO.getBirthday() != null) {
-                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                        SimpleDateFormat sdf = new SimpleDateFormat(CommonConstant.FORMAT_DATE_PATTERN);
                         birthday = sdf.parse(accountDTO.getBirthday());
-                        linkUrl = cloudinary.getUrlFromFile(accountDTO.getAvatar());
                     }
                 } catch (Exception e) {
                     log.error(e.getMessage());
                 }
                 User account = modelMapper.map(accountDTO, User.class);
                 account.setBirthday(birthday);
-                account.setAvatar(linkUrl);
+                account.setAvatar(accountDTO.getAvatar());
                 account.setId(id);
                 account.setCreateBy(findAccount.get().getCreateBy());
                 account.setPassword(passwordEncoder.encode(accountDTO.getPassword()));
                 return userRepository.save(account);
             } else {
-                throw new VsException(String.format(DevMessageConstant.Common.EXITS_USERNAME, accountDTO.getUsername()));
+                throw new VsException(String.format(DevMessageConstant.Common.EXITS_USERNAME,
+                        accountDTO.getUsername()));
             }
         }
     }
@@ -146,7 +136,8 @@ public class UserServiceImpl implements IUserService {
     @Override
     public String delete(int id) {
         if (!userRepository.existsById(id)) {
-            throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID, "User", id));
+            throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID,
+                    CommonConstant.ClassName.USER_CLASS_NAME, id));
         } else {
             userRepository.deleteById(id);
         }

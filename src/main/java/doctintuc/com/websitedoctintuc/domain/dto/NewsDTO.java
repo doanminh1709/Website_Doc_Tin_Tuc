@@ -11,11 +11,9 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NewsDTO {
-    private String newsName;
-    private String content;
     private String title;
+    private String content;
     private String author;
-    private String phone;
     private String description;
-    private MultipartFile thumbnail;
+    private String thumbnail;
 }

@@ -13,7 +13,7 @@ public interface NewsResource {
 
     @ApiOperation(value = "Create news")
     @PostMapping("/admin/create-new")
-    ResponseEntity<?> create(@ModelAttribute NewsDTO newsDTO);
+    ResponseEntity<?> create(@RequestBody NewsDTO newsDTO);
 
     @ApiOperation(value = "Get news by id")
     @GetMapping("/no-auth/get-news/{id}")
@@ -25,8 +25,8 @@ public interface NewsResource {
 
     @ApiOperation(value = "Search all news")
     @GetMapping("/no-auth/search-all")
-    ResponseEntity<?> searchAll(@RequestParam(name = "page", required = false) Integer page,
-                                @RequestParam(name = "page", required = true, defaultValue = "10") Integer size);
+    ResponseEntity<?> searchAll(@RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
+                                @RequestParam(name = "page", required = false, defaultValue = "10") Integer size);
 
     @ApiOperation(value = "Delete news by id")
     @GetMapping("/admin/delete/{id}")
@@ -43,8 +43,8 @@ public interface NewsResource {
 
     @ApiOperation(value = "Paginate home page")
     @GetMapping("/no-auth/paginate-home")
-    ResponseEntity<?> paginateHomePage(@RequestParam(name = "page", required = false) Integer page,
-                                       @RequestParam(name = "page", required = true, defaultValue = "10") Integer size);
+    ResponseEntity<?> paginateHomePage(@RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
+                                       @RequestParam(name = "page-size", required = false, defaultValue = "10") Integer size);
 
     @ApiOperation(value = "Update view count")
     @GetMapping("/no-auth/set-view/{id}")

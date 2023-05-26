@@ -21,11 +21,15 @@ public class Category extends AbstractBase {
     @NotBlank(message = "Category name is not blank")
     @Column(name = "category_name")
     private String categoryName;
+
+    @Column(name = "tags")
+    private String tags;
+
     @Column(name = "description")
     private String description;
     @Column(name = "parent_id")
     private int parentId;
-    @OneToMany(mappedBy = "news" , cascade = CascadeType.ALL , fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "category" , cascade = CascadeType.ALL , fetch = FetchType.LAZY)
     private List<News> news;
 
 }

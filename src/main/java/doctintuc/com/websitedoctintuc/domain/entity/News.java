@@ -19,10 +19,7 @@ import java.util.List;
 @Entity
 public class News extends AbstractBase {
 
-    @NotBlank(message = "News name is not blank")
-    @Column(name = "news_name", nullable = false)
-    private String newsName;
-
+    @NotBlank(message = "Title is not blank")
     @Column(name = "title")
     private String title;
 
@@ -36,9 +33,9 @@ public class News extends AbstractBase {
     @Column(name = "description")
     private String description;
 
+    @NotBlank(message = "Thumbnail is not blank")
     @Column(name = "thumbnail", nullable = false)
     private String thumbnail;
-
 
     @Min(value = 0)
     @Column(name = "view")
@@ -47,9 +44,10 @@ public class News extends AbstractBase {
     @OneToMany(mappedBy = "news", fetch = FetchType.EAGER, cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     private List<Comment> comments;
 
+
     @ManyToOne
-    @JoinColumn(name = "news_id" , referencedColumnName = "id")
-    private News news;
+    @JoinColumn(name = "category_id" , referencedColumnName = "id")
+    private Category category;
 
     public News(int id, String title, String description, String thumbnail) {
         this.setId(id);
