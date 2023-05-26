@@ -19,7 +19,6 @@ public interface NewsRepository extends JpaRepository<News, Integer> {
     @Query(value = "SELECT u.id , u.title , u.description , u.thumbnail FROM News u ORDER BY u.createDate DESC  LIMIT  7",nativeQuery = true)
     List<News> leastNews();
 
-    //Note
     @Query(value = "SELECT u.id , u.title , u.description , u.thumbnail FROM  News  u ORDER BY u.createDate",nativeQuery = true)
     List<News> allNews(Pageable pageable);
 

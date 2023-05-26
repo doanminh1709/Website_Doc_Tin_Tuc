@@ -23,7 +23,6 @@ import java.util.Optional;
 public class NewsServiceImpl implements INewsService {
 
     private final NewsRepository newsRepository;
-    private final ModelMapper modelMapper;
 
     private final CategoryRepository categoryRepository;
 

@@ -8,12 +8,10 @@ import javax.persistence.Column;
 @Getter
 @Setter
 public class CategoryDTO {
-
-
     private String categoryName;
 
     private String description;
 
-    private int parentId;
+    private String parentId;
 
 }

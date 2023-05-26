@@ -1,6 +1,5 @@
 package doctintuc.com.websitedoctintuc.application.service.user_detail;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import doctintuc.com.websitedoctintuc.domain.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -30,11 +30,9 @@ public interface CategoryResource {
     ResponseEntity<?> updateCategory(@PathVariable("id") Integer id,
                                      @RequestBody(required = false) CategoryDTO request);
 
-
     @ApiOperation(value = "Get category by id")
     @DeleteMapping("/admin/delete-category/{id}")
     ResponseEntity<?> deleteCategory(@PathVariable("id") Integer id);
-
 
     @ApiOperation(value = "Get all category")
     @GetMapping("/no-auth/search-category")
