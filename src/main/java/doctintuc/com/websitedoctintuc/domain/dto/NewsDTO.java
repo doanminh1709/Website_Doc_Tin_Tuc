@@ -17,6 +17,5 @@ public class NewsDTO {
     private String author;
     private String phone;
     private String description;
-    private int view;
     private MultipartFile thumbnail;
 }

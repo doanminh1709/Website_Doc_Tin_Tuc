@@ -1,16 +1,15 @@
 package doctintuc.com.websitedoctintuc.application.filter;
 
-import doctintuc.com.websitedoctintuc.application.constants.DevMessageConstant;
 import doctintuc.com.websitedoctintuc.application.jwt.JwtUtils;
 import doctintuc.com.websitedoctintuc.application.service.user_detail.UserDetailService;
-import doctintuc.com.websitedoctintuc.config.exception.VsException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -23,6 +22,7 @@ import java.io.IOException;
 @Service
 public class AuthTokenFilter extends OncePerRequestFilter {
 
+    private static final Logger LOG = LoggerFactory.getLogger(AuthTokenFilter.class);
     @Autowired
     private JwtUtils jwtUtils;
     @Autowired
@@ -38,40 +38,18 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(userDetails.getUsername(),
-                                userDetails.getPassword() , userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().
-                        buildDetails(request));
+                               null , userDetails.getAuthorities());
+//                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } else {
                 SecurityContextHolder.clearContext();
-//                log.error("Authentication failed!");
             }
         } catch (Exception e) {
-//            log.error("Error : " + e.getMessage());
+            LOG.error("Authentication failed : " + e.getMessage());
         }
-        filterChain.doFilter(request , response);
+        filterChain.doFilter(request, response);
     }
 
-
-//    @Override
-//    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-//        String token = extractToken(request);
-//        if (token != null && jwtUtils.validationToken(token)) {
-//            String username = jwtUtils.getUserByToken(token);
-//            UserDetails userDetails = userDetailService.loadUserByUsername(username);
-//            if (!ObjectUtils.isEmpty(userDetails)) {
-//                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-//                        username, "", null
-//                );
-//                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-//                SecurityContextHolder.getContext().setAuthentication(authentication);
-//            } else {
-//                SecurityContextHolder.clearContext();
-//                throw new VsException(DevMessageConstant.Common.OBJECT_IS_EMPTY);
-//            }
-//        }
-//        filterChain.doFilter(request, response);
-//    }
 
     public String extractToken(HttpServletRequest request) {
         String authToken = request.getHeader("Authorization");

@@ -27,9 +27,7 @@ public class UserDetailImp implements UserDetails {
     private String birthday;
     private String gender;
     private String avatar;
-    @JsonIgnore
     private String username;
-    @JsonIgnore
     private String password;
 
     private Collection<? extends GrantedAuthority> authorities;
@@ -60,12 +58,12 @@ public class UserDetailImp implements UserDetails {
 
     @Override
     public String getPassword() {
-        return username;
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return password;
+        return username;
     }
 
     @Override

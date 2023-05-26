@@ -1,39 +1,43 @@
 package doctintuc.com.websitedoctintuc.application.service.impl;
 
+import doctintuc.com.websitedoctintuc.application.constants.CommonConstant;
 import doctintuc.com.websitedoctintuc.application.constants.DevMessageConstant;
 import doctintuc.com.websitedoctintuc.application.constants.EnumRole;
 import doctintuc.com.websitedoctintuc.application.jwt.JwtUtils;
 import doctintuc.com.websitedoctintuc.application.repository.RoleRepository;
 import doctintuc.com.websitedoctintuc.application.repository.UserRepository;
-import doctintuc.com.websitedoctintuc.application.request.LoginRequest;
 import doctintuc.com.websitedoctintuc.application.response.UserResponse;
 import doctintuc.com.websitedoctintuc.application.service.IUserService;
 import doctintuc.com.websitedoctintuc.application.service.user_detail.UserDetailImp;
 import doctintuc.com.websitedoctintuc.application.utils.UploadCloudinary;
 import doctintuc.com.websitedoctintuc.config.exception.VsException;
 import doctintuc.com.websitedoctintuc.domain.dto.UserDTO;
-import doctintuc.com.websitedoctintuc.domain.entity.Role;
 import doctintuc.com.websitedoctintuc.domain.entity.User;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
+@AllArgsConstructor
 public class UserServiceImpl implements IUserService {
 
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
@@ -51,23 +55,39 @@ public class UserServiceImpl implements IUserService {
             throw new VsException(String.format(DevMessageConstant.Common.EXITS_USERNAME, accountDTO.getUsername()));
         }
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            SimpleDateFormat sdf = new SimpleDateFormat(CommonConstant.FORMAT_DATE_PATTERN);
             Date birthday = null;
             if (accountDTO.getBirthday() != null) {
                 birthday = sdf.parse(accountDTO.getBirthday());
             }
             String linkImg = cloudinary.getUrlFromFile(accountDTO.getAvatar());
             User account = new User();
-            account.setBirthday(birthday);
             account.setEmail(accountDTO.getEmail());
             account.setGender(accountDTO.getGender());
             account.setAddress(accountDTO.getAddress());
             account.setFullName(accountDTO.getFullName());
             account.setUsername(accountDTO.getUsername());
+            account.setPhone(accountDTO.getPhone());
+
+//            PropertyMap<UserDTO, User> userMap = new PropertyMap<>() {
+//                @Override
+//                protected void configure() {
+//                    skip().setBirthday(null);
+//                    skip().setAvatar(null);
+//                    skip().setCreateBy(null);
+//                    skip().setLastModifiedBy(null);
+//                    skip().setPassword(null);
+//                    skip().setRole(null);
+//                }
+//            };
+//            modelMapper.addMappings(userMap);
+//            account = modelMapper.map(accountDTO, User.class);
+            account.setBirthday(birthday);
             account.setAvatar(linkImg);
+            account.setCreateBy(CommonConstant.ROLE_SUPER_ADMIN);
+            account.setLastModifiedBy(CommonConstant.ROLE_SUPER_ADMIN);
             account.setPassword(passwordEncoder.encode(accountDTO.getPassword()));
-            Role role = roleRepository.findRoleByRoleName(EnumRole.ROLE_USER);
-            account.setRole(role);
+            account.setRole(roleRepository.findRoleByRoleName(EnumRole.ROLE_USER));
 
             return userRepository.save(account);
         } catch (Exception e) {
@@ -80,7 +100,8 @@ public class UserServiceImpl implements IUserService {
     public User get(int id) {
         Optional<User> account = userRepository.findById(id);
         if (ObjectUtils.isEmpty(account)) {
-            throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID, User.class.getName(), id));
+            throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID,
+                    User.class.getName(), id));
         }
         return account.get();
     }
@@ -90,31 +111,35 @@ public class UserServiceImpl implements IUserService {
         if (!userRepository.existsById(id)) {
             throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID, User.class.getName(), id));
         } else {
-            try {
-                Optional<User> findAccount = userRepository.findById(id);
-                String linkUrl;
-                if (accountDTO.getAvatar().getOriginalFilename() == null) {
-                    linkUrl = findAccount.get().getAvatar();
-                }
-                if (findAccount.get().getUsername().equals(accountDTO.getUsername()) ||
-                        !userRepository.existsByUsername(accountDTO.getUsername())) {
-                    Date birthday = null;
+            Optional<User> findAccount = userRepository.findById(id);
+            String linkUrl = null;
+            if (accountDTO.getAvatar().getOriginalFilename() == null) {
+                linkUrl = findAccount.get().getAvatar();
+            }
+            if (findAccount.get().getUsername().equals(accountDTO.getUsername()) ||
+                    !userRepository.existsByUsername(accountDTO.getUsername())) {
+
+                Date birthday = null;
+
+                try {
                     if (accountDTO.getBirthday() != null) {
                         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                         birthday = sdf.parse(accountDTO.getBirthday());
+                        linkUrl = cloudinary.getUrlFromFile(accountDTO.getAvatar());
                     }
-                    linkUrl = cloudinary.getUrlFromFile(accountDTO.getAvatar());
-                    User account = modelMapper.map(accountDTO, User.class);
-                    account.setBirthday(birthday);
-                    account.setAvatar(linkUrl);
-                    account.setPassword(passwordEncoder.encode(accountDTO.getPassword()));
-                } else {
-                    throw new VsException(String.format(DevMessageConstant.Common.EXITS_USERNAME, accountDTO.getUsername()));
+                } catch (Exception e) {
+                    log.error(e.getMessage());
                 }
-            } catch (Exception e) {
-                log.error(String.valueOf(e));
+                User account = modelMapper.map(accountDTO, User.class);
+                account.setBirthday(birthday);
+                account.setAvatar(linkUrl);
+                account.setId(id);
+                account.setCreateBy(findAccount.get().getCreateBy());
+                account.setPassword(passwordEncoder.encode(accountDTO.getPassword()));
+                return userRepository.save(account);
+            } else {
+                throw new VsException(String.format(DevMessageConstant.Common.EXITS_USERNAME, accountDTO.getUsername()));
             }
-            return null;
         }
     }
 
@@ -134,28 +159,24 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public UserResponse login(LoginRequest loginRequest) {
+    public UserResponse login(String username, String password) {
 
         try {
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
-                            loginRequest.getPassword())
-            );
+                    new UsernamePasswordAuthenticationToken("test123", "123"));
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
             UserDetailImp user = (UserDetailImp) authentication.getPrincipal();
-            if (user != null) {
-                String accessToken = jwtUtils.generateTokenByUsername(user.getUsername());
-                String birthday = user.getBirthday().toString();
-                return new UserResponse(
-                        user.getId(),
-                        user.getFullName(),
-                        user.getEmail(),
-                        birthday,
-                        user.getGender(),
-                        user.getAvatar(),
-                        accessToken);
-            }
-        } catch (Exception e) {
+            String accessToken = jwtUtils.generateTokenByUsername(user.getUsername());
+            return new UserResponse(
+                    user.getId(),
+                    user.getFullName(),
+                    user.getEmail(),
+                    user.getBirthday(),
+                    user.getGender(),
+                    user.getAvatar(),
+                    accessToken);
+        } catch (BadCredentialsException e) {
             log.error(String.valueOf(e));
             SecurityContextHolder.clearContext();
         }
@@ -163,7 +184,9 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public User logout() {
-        return null;
+    public String logout(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
+        SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+        logoutHandler.logout(request, response, authentication);
+        return DevMessageConstant.Common.LOGOUT;
     }
 }

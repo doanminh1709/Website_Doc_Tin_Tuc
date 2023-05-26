@@ -28,11 +28,11 @@ public abstract class AbstractBase implements Serializable {
     protected Integer id;
 
     @CreationTimestamp
-    @Column(name = "create_date", nullable = false, length = 50, updatable = false)
+    @Column(name = "create_date",  length = 50, updatable = false)
     protected Timestamp createDate;
 
     @CreatedBy
-    @Column(name = "create_by" , nullable = false)
+    @Column(name = "create_by", nullable = true)
     private String createBy;
 
     @UpdateTimestamp

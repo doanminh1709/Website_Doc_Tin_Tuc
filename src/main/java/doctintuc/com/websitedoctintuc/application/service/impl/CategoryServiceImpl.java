@@ -1,5 +1,6 @@
 package doctintuc.com.websitedoctintuc.application.service.impl;
 
+import doctintuc.com.websitedoctintuc.application.constants.CommonConstant;
 import doctintuc.com.websitedoctintuc.application.constants.DevMessageConstant;
 import doctintuc.com.websitedoctintuc.application.repository.CategoryRepository;
 import doctintuc.com.websitedoctintuc.application.service.ICategoryService;
@@ -32,9 +33,9 @@ public class CategoryServiceImpl implements ICategoryService {
     @Override
     public Category getCategory(Integer id) {
         if (!repository.existsById(id)) {
-            throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID, Category.class.getName(), id));
+            throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID, CommonConstant.ClassName.CATEGORY_CLASS_NAME, id));
         }
-        return repository.getById(id);
+        return repository.findById(id).get();
     }
 
     @Override
@@ -44,17 +45,25 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     public Category update(Integer id, CategoryDTO categoryDTO) {
-        if (repository.existsByCategoryName(categoryDTO.getCategoryName())) {
-            throw new VsException(String.format(DevMessageConstant.Common.EXITS_USERNAME, categoryDTO.getCategoryName()));
+
+        Optional<Category> found_category = repository.findById(id);
+        if (found_category.isPresent()) {
+            if (repository.existsByCategoryName(categoryDTO.getCategoryName())) {
+                throw new VsException(String.format(DevMessageConstant.Common.EXITS_USERNAME, categoryDTO.getCategoryName()));
+            }
+            Optional<Category> category = Optional.ofNullable(modelMapper.map(categoryDTO, Category.class));
+            category.get().setId(id);
+            category.get().setCreateBy(found_category.get().getCreateBy());
+            return repository.save(category.get());
+        }else{
+            throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID, CommonConstant.ClassName.CATEGORY_CLASS_NAME, id));
         }
-        Optional<Category> category = Optional.ofNullable(modelMapper.map(categoryDTO, Category.class));
-        return repository.save(category.get());
     }
 
     @Override
     public String delete(Integer id) {
         if (!repository.existsById(id)) {
-            throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID, Category.class.getName(), id));
+            throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID, CommonConstant.ClassName.CATEGORY_CLASS_NAME, id));
         }
         repository.deleteById(id);
         return DevMessageConstant.Common.NOTIFICATION_DELETE_SUCCESS;

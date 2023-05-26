@@ -1,6 +1,7 @@
 package doctintuc.com.websitedoctintuc.application.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import doctintuc.com.websitedoctintuc.application.constants.DevMessageConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -28,8 +29,7 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 
         final Map<String, Object> body = new HashMap<>();
         body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
-        body.put("message", authException.getMessage());
-        body.put("error", "Authorized error ");
+        body.put("message", DevMessageConstant.Common.AUTHORIZED);
         body.put("path", request.getServletPath());
 
         ObjectMapper objectMapper = new ObjectMapper();

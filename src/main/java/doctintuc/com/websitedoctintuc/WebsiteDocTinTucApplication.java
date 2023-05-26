@@ -4,6 +4,8 @@ import com.github.slugify.Slugify;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootApplication
 public class WebsiteDocTinTucApplication {
@@ -15,5 +17,10 @@ public class WebsiteDocTinTucApplication {
     @Bean
     public Slugify slugify() {
         return new Slugify();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

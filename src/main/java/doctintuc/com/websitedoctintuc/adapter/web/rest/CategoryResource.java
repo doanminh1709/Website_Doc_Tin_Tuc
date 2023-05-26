@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 @Validated
 @Api(tags = "Category Resource")
 public interface CategoryResource {
@@ -15,11 +14,11 @@ public interface CategoryResource {
     @ApiOperation(value = "Get all category")
     @GetMapping("/both/search-category")
     ResponseEntity<?> searchCategory(@RequestParam Integer page,
-                                     @RequestParam Integer size);
+                                     @RequestParam(name = "size", defaultValue = "10") Integer size);
 
     @ApiOperation(value = "Create new category")
     @PostMapping("/admin/create-category")
-    ResponseEntity<?> createCategory(@RequestBody(required = false) @Valid CategoryDTO request);
+    ResponseEntity<?> createCategory(@RequestBody(required = false) CategoryDTO request);
 
 
     @ApiOperation(value = "Get category by id")
@@ -29,7 +28,7 @@ public interface CategoryResource {
     @ApiOperation(value = "Edit category by id")
     @PatchMapping("/admin/update-category/{id}")
     ResponseEntity<?> updateCategory(@PathVariable("id") Integer id,
-                                     @RequestBody(required = false) @Valid CategoryDTO request);
+                                     @RequestBody(required = false) CategoryDTO request);
 
 
     @ApiOperation(value = "Get category by id")

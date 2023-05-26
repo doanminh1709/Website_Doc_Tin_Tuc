@@ -43,6 +43,7 @@ public class DevMessageConstant {
         public static final String UPLOAD_DATA_FROM_EXCEL_FILE_FAILED = "Upload data from excel file failed!";
         public static final String NOTIFICATION_DELETE_FAILED = "Remove object by id is failed!";
         public static final String NOTIFICATION_DELETE_SUCCESS = "Remove object by id is success!";
+        public static final String AUTHORIZED = "You don't have authorized to action this request!";
 
         private Common() {
         }

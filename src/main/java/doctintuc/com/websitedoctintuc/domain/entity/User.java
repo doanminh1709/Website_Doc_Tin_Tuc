@@ -1,5 +1,6 @@
 package doctintuc.com.websitedoctintuc.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import doctintuc.com.websitedoctintuc.domain.entity.base.AbstractBase;
 import lombok.AllArgsConstructor;
@@ -52,6 +53,7 @@ public class User extends AbstractBase {
     @Column(name = "avatar")
     private String avatar;
 
+    @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "user_news",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -59,6 +61,7 @@ public class User extends AbstractBase {
     )
     private List<News> news;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user",
             fetch = FetchType.EAGER,
             cascade = CascadeType.ALL)

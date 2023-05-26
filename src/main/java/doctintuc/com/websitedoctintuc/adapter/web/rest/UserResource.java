@@ -5,8 +5,12 @@ import doctintuc.com.websitedoctintuc.domain.dto.UserDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Validated
 @Api(tags = "Users Resource")
@@ -30,15 +34,16 @@ public interface UserResource {
 
     @ApiOperation(value = "Search all user")
     @GetMapping("/admin/search-all")
-    ResponseEntity<?> searchAll(@RequestParam Integer page, @RequestParam Integer size);
+    ResponseEntity<?> searchAll(@RequestParam(name = "page" , required = false, defaultValue = "0") Integer page,
+                                @RequestParam(name = "size" , required = false, defaultValue = "10") Integer size);
 
 
     @ApiOperation(value = "Login")
     @PostMapping("/both/login")
-    ResponseEntity<?> login(@RequestBody LoginRequest request);
+    ResponseEntity<?> login(@RequestParam String username , @RequestParam String password);
 
 
     @ApiOperation(value = "logout")
     @GetMapping("/both/logout")
-    ResponseEntity<?> logout();
+    ResponseEntity<?> logout(Authentication authentication, HttpServletRequest request, HttpServletResponse response);
 }

@@ -3,16 +3,18 @@ package doctintuc.com.websitedoctintuc.adapter.web.rest.impl;
 import doctintuc.com.websitedoctintuc.adapter.web.base.RestApiV1;
 import doctintuc.com.websitedoctintuc.adapter.web.base.VsResponseUtil;
 import doctintuc.com.websitedoctintuc.adapter.web.rest.UserResource;
-import doctintuc.com.websitedoctintuc.application.request.LoginRequest;
 import doctintuc.com.websitedoctintuc.application.service.IUserService;
 import doctintuc.com.websitedoctintuc.domain.dto.UserDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @RestApiV1
 @RequiredArgsConstructor
 public class UserResourceImpl implements UserResource {
-
     private final IUserService userService;
 
     @Override
@@ -41,12 +43,12 @@ public class UserResourceImpl implements UserResource {
     }
 
     @Override
-    public ResponseEntity<?> login(LoginRequest request) {
-        return VsResponseUtil.ok(userService.login(request));
+    public ResponseEntity<?> login(String username , String password) {
+        return VsResponseUtil.ok(userService.login("test123" , "123"));
     }
 
     @Override
-    public ResponseEntity<?> logout() {
-        return null;
+    public ResponseEntity<?> logout(Authentication authentication , HttpServletRequest request , HttpServletResponse response) {
+        return VsResponseUtil.ok(userService.logout(authentication , request , response));
     }
 }
