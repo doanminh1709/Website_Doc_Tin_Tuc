@@ -8,9 +8,9 @@ import java.util.List;
 public interface ICategoryService {
     Category create(CategoryDTO categoryDTO);
     Category getCategory(Integer id);
-    List<Category> searchAll(Integer page, Integer size);
+    List<Category> searchPageCategory(Integer page, Integer size);
     Category update(Integer id, CategoryDTO categoryDTO);
     String delete(Integer id);
-    List<Category> searchCategory();
+    List<Category> searchAllCategory();
 
 }

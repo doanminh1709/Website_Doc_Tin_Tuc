@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.*;
 public interface CategoryResource {
 
     @ApiOperation(value = "Get all category")
-    @GetMapping("/both/search-category")
-    ResponseEntity<?> searchCategory(@RequestParam Integer page,
+    @GetMapping("/admin/search-category")
+    ResponseEntity<?> searchPageCategory(@RequestParam(name = "page", defaultValue = "0") Integer page,
                                      @RequestParam(name = "size", defaultValue = "10") Integer size);
 
     @ApiOperation(value = "Create new category")
@@ -35,4 +35,8 @@ public interface CategoryResource {
     @DeleteMapping("/admin/delete-category/{id}")
     ResponseEntity<?> deleteCategory(@PathVariable("id") Integer id);
 
+
+    @ApiOperation(value = "Get all category")
+    @GetMapping("/no-auth/search-category")
+    ResponseEntity<?> getAllCategory();
 }

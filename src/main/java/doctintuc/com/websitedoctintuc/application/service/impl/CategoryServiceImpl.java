@@ -39,7 +39,7 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     @Override
-    public List<Category> searchAll(Integer page, Integer size) {
+    public List<Category> searchPageCategory(Integer page, Integer size) {
         return repository.findAll(PageRequest.of(page, size)).getContent();
     }
 
@@ -70,7 +70,7 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     @Override
-    public List<Category> searchCategory() {
+    public List<Category> searchAllCategory() {
         return repository.findAll();
     }
 }

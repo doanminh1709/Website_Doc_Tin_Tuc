@@ -15,7 +15,7 @@ public class CategoryResourceImpl implements CategoryResource {
     private final ICategoryService categoryService;
 
     @Override
-    public ResponseEntity<?> searchCategory(Integer page, Integer size) {
+    public ResponseEntity<?> searchPageCategory(Integer page, Integer size) {
         return VsResponseUtil.ok(categoryService.searchAll(page, size));
     }
 
@@ -37,5 +37,10 @@ public class CategoryResourceImpl implements CategoryResource {
     @Override
     public ResponseEntity<?> deleteCategory(Integer id) {
         return VsResponseUtil.ok(categoryService.delete(id));
+    }
+
+    @Override
+    public ResponseEntity<?> getAllCategory() {
+        return VsResponseUtil.ok(categoryService.searchCategory());
     }
 }
