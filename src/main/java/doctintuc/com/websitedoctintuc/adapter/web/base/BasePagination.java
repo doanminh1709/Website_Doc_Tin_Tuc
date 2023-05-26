@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BasePagination<E, R extends JpaRepository<E, ?>> {
-
     private R repository;
 
     public PaginateDTO<?> paginate(Integer page, Integer perpage) {

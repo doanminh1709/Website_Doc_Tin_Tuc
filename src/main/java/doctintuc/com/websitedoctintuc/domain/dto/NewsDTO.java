@@ -1,22 +1,22 @@
 package doctintuc.com.websitedoctintuc.domain.dto;
 
-import jakarta.persistence.Column;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class NewsDTO {
     private String newsName;
-
-    private String title;
-
     private String content;
-
-    private String tags;
-
-    private MultipartFile video;
-
-    private MultipartFile podcast;
+    private String title;
+    private String author;
+    private String phone;
+    private String description;
+    private int view;
+    private MultipartFile thumbnail;
 }
