@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 public interface NewsResource {
 
     @ApiOperation(value = "Create news")
-    @PostMapping("/admin/create-new")
+    @PostMapping("/admin/create-news")
     ResponseEntity<?> create(@RequestBody NewsDTO newsDTO);
 
     @ApiOperation(value = "Get news by id")
@@ -20,8 +20,8 @@ public interface NewsResource {
     ResponseEntity<?> get(@PathVariable("id") Integer id);
 
     @ApiOperation(value = "Get news by id")
-    @GetMapping("/admin/update/{id}")
-    ResponseEntity<?> update(@PathVariable("id") Integer id, @ModelAttribute NewsDTO newsDTO);
+    @PatchMapping("/admin/update/{id}")
+    ResponseEntity<?> update(@PathVariable("id") Integer id, @RequestBody NewsDTO newsDTO);
 
     @ApiOperation(value = "Search all news")
     @GetMapping("/no-auth/search-all")

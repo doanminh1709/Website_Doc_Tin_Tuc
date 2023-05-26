@@ -16,4 +16,5 @@ public class NewsDTO {
     private String author;
     private String description;
     private String thumbnail;
+    private int categoryId;
 }

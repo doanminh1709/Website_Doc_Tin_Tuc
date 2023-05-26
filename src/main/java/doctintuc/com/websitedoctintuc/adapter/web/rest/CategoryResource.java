@@ -18,7 +18,7 @@ public interface CategoryResource {
 
     @ApiOperation(value = "Create new category")
     @PostMapping("/admin/create-category")
-    ResponseEntity<?> createCategory(@RequestBody(required = false) CategoryDTO request);
+    ResponseEntity<?> createCategory(@RequestBody CategoryDTO request);
 
 
     @ApiOperation(value = "Get category by id")

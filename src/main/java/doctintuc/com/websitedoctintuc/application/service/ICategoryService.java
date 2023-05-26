@@ -11,5 +11,6 @@ public interface ICategoryService {
     List<Category> searchAll(Integer page, Integer size);
     Category update(Integer id, CategoryDTO categoryDTO);
     String delete(Integer id);
+    List<Category> searchCategory();
 
 }

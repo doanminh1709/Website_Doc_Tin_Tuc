@@ -1,5 +1,6 @@
 package doctintuc.com.websitedoctintuc.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import doctintuc.com.websitedoctintuc.domain.entity.base.AbstractBase;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,6 +30,8 @@ public class Category extends AbstractBase {
     private String description;
     @Column(name = "parent_id")
     private int parentId;
+
+    @JsonIgnore
     @OneToMany(mappedBy = "category" , cascade = CascadeType.ALL , fetch = FetchType.LAZY)
     private List<News> news;
 

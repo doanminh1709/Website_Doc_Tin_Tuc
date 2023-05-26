@@ -55,7 +55,7 @@ public class CategoryServiceImpl implements ICategoryService {
             category.get().setId(id);
             category.get().setCreateBy(found_category.get().getCreateBy());
             return repository.save(category.get());
-        }else{
+        } else {
             throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID, CommonConstant.ClassName.CATEGORY_CLASS_NAME, id));
         }
     }
@@ -67,5 +67,10 @@ public class CategoryServiceImpl implements ICategoryService {
         }
         repository.deleteById(id);
         return DevMessageConstant.Common.NOTIFICATION_DELETE_SUCCESS;
+    }
+
+    @Override
+    public List<Category> searchCategory() {
+        return repository.findAll();
     }
 }

@@ -1,5 +1,6 @@
 package doctintuc.com.websitedoctintuc.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import doctintuc.com.websitedoctintuc.domain.entity.base.AbstractBase;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -45,8 +46,9 @@ public class News extends AbstractBase {
     private List<Comment> comments;
 
 
+    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "category_id" , referencedColumnName = "id")
+    @JoinColumn(name = "category_id", referencedColumnName = "id")
     private Category category;
 
     public News(int id, String title, String description, String thumbnail) {
@@ -56,4 +58,12 @@ public class News extends AbstractBase {
         this.thumbnail = thumbnail;
     }
 
+    public News(String title, String content, String author, String description, String thumbnail ) {
+        this.title = title;
+        this.content = content;
+        this.author = author;
+        this.description = description;
+        this.thumbnail = thumbnail;
+        this.setView(0);
+    }
 }
