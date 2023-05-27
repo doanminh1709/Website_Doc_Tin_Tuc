@@ -10,6 +10,7 @@ import doctintuc.com.websitedoctintuc.application.request.LoginRequest;
 import doctintuc.com.websitedoctintuc.application.response.UserResponse;
 import doctintuc.com.websitedoctintuc.application.service.IUserService;
 import doctintuc.com.websitedoctintuc.application.service.user_detail.UserDetailImp;
+import doctintuc.com.websitedoctintuc.application.utils.GetPrincipal;
 import doctintuc.com.websitedoctintuc.config.exception.VsException;
 import doctintuc.com.websitedoctintuc.domain.dto.UserDTO;
 import doctintuc.com.websitedoctintuc.domain.entity.User;
@@ -45,6 +46,7 @@ public class UserServiceImpl implements IUserService {
     private final RoleRepository roleRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
+    private final GetPrincipal getPrincipal;
 
     @Override
     public User create(UserDTO accountDTO) {
@@ -56,6 +58,17 @@ public class UserServiceImpl implements IUserService {
             Date birthday = null;
             if (accountDTO.getBirthday() != null) {
                 birthday = sdf.parse(accountDTO.getBirthday());
+            }
+            //Check current login
+            String createBy;
+            if (getPrincipal.getCurrentPrincipal() != null){
+                if (getPrincipal.getCurrentPrincipal().equals(EnumRole.ROLE_ADMIN.toString())){
+                    createBy = CommonConstant.ROLE__ADMIN;
+                }else{
+                    createBy = CommonConstant.ROLE_SUPER_ADMIN;
+                }
+            }else{
+                createBy = CommonConstant.ROLE_USER;
             }
             User account = new User();
             account.setEmail(accountDTO.getEmail());
@@ -79,8 +92,8 @@ public class UserServiceImpl implements IUserService {
 //            modelMapper.addMappings(userMap);
 //            account = modelMapper.map(accountDTO, User.class);
             account.setBirthday(birthday);
-            account.setCreateBy(CommonConstant.ROLE_SUPER_ADMIN);
-            account.setLastModifiedBy(CommonConstant.ROLE_SUPER_ADMIN);
+            account.setCreateBy(createBy);
+//            account.setLastModifiedBy(CommonConstant.ROLE_SUPER_ADMIN);
             account.setPassword(new BCryptPasswordEncoder().encode(accountDTO.getPassword()));
             account.setRole(roleRepository.findRoleByRoleName(EnumRole.ROLE_USER));
 
@@ -110,7 +123,16 @@ public class UserServiceImpl implements IUserService {
             Optional<User> findAccount = userRepository.findById(id);
             if (findAccount.get().getUsername().equals(accountDTO.getUsername()) ||
                     !userRepository.existsByUsername(accountDTO.getUsername())) {
-
+                String lastModifiedBy;
+                if (getPrincipal.getCurrentPrincipal() != null){
+                    if (getPrincipal.getCurrentPrincipal().equals(EnumRole.ROLE_ADMIN.toString())){
+                        lastModifiedBy = CommonConstant.ROLE__ADMIN;
+                    }else{
+                        lastModifiedBy = CommonConstant.ROLE_SUPER_ADMIN;
+                    }
+                }else{
+                    lastModifiedBy = CommonConstant.ROLE_USER;
+                }
                 Date birthday = null;
                 try {
                     if (accountDTO.getBirthday() != null) {
@@ -125,6 +147,7 @@ public class UserServiceImpl implements IUserService {
                 account.setAvatar(accountDTO.getAvatar());
                 account.setId(id);
                 account.setCreateBy(findAccount.get().getCreateBy());
+                account.setLastModifiedBy(lastModifiedBy);
                 account.setPassword(new BCryptPasswordEncoder().encode(accountDTO.getPassword()));
                 return userRepository.save(account);
             } else {

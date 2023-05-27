@@ -13,9 +13,9 @@ public class CommonConstant {
     public static int SIZE_OFF_PAGE = 10;
     public static final String SORT_ASC = "ASC";
     public static final String SORT_DESC = "DESC";
-    public static final String ROLE_SUPER_ADMIN="super_admin";
-    public static final String ROLE_USER="admin";
-    public static final String ROLE__ADMIN="user";
+    public static final String ROLE_SUPER_ADMIN = "super_admin";
+    public static final String ROLE_USER="user";
+    public static final String ROLE__ADMIN="admin";
 
     public static final String SORT_BY_TIME = "create_date";
     public static final String SORT_BY_TIME2 = "createDate";
