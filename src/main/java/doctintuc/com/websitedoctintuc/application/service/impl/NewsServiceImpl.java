@@ -136,7 +136,6 @@ public class NewsServiceImpl implements INewsService {
         return newsRepository.findAll(PageRequest.of(page, size, Sort.by(CommonConstant.SORT_BY_TIME2).descending())).getContent();
     }
 
-
     @Override
     public News setView(Integer id) {
         if (!newsRepository.existsById(id)) {
@@ -149,35 +148,33 @@ public class NewsServiceImpl implements INewsService {
     }
 
     @Override
-    public List<CustomNewDTO> filterNewsByCategory(Integer page, Integer size, String author, String title, Integer categoryId, String filter) {
+    public CustomNewDTO filterNewsByCategory(Integer page, Integer size, String author, String title, Integer categoryId, String filter) {
         if (!categoryRepository.existsById(categoryId)) {
             throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID,
                     CommonConstant.ClassName.CATEGORY_CLASS_NAME, categoryId));
         }
-        List<CustomNewDTO> listNewByCategory = new ArrayList<>();
+        List<News> listNewByCategory = new ArrayList<>();
         if (!StringUtils.hasText(filter) || filter.equalsIgnoreCase(CommonConstant.SORT_ASC)) {
             List<News> listNews1 = newsRepository.filterNewsByCategory(categoryId, title, author, PageRequest.of(page, size,
                     Sort.by(CommonConstant.SORT_BY_TIME).ascending()));
             for (News item : listNews1) {
-                listNewByCategory.add(new CustomNewDTO(
+                listNewByCategory.add(new News(
                         item.getId(), item.getTitle(), item.getContent(),
                         item.getAuthor(), item.getDescription(),
-                        item.getThumbnail(), item.getView(),
-                        categoryRepository.findById(categoryId).get()));
+                        item.getThumbnail(), item.getView()));
             }
         }
         if (StringUtils.hasText(filter) && filter.equalsIgnoreCase(CommonConstant.SORT_DESC)) {
             List<News> listNews2 = newsRepository.filterNewsByCategory(categoryId, title, author, PageRequest.of(page, size,
                     Sort.by(CommonConstant.SORT_BY_TIME).descending()));
             for (News item : listNews2) {
-                listNewByCategory.add(new CustomNewDTO(
+                listNewByCategory.add(new News(
                         item.getId(), item.getTitle(), item.getContent(),
                         item.getAuthor(), item.getDescription(),
-                        item.getThumbnail(), item.getView(),
-                        categoryRepository.findById(categoryId).get()));
+                        item.getThumbnail(), item.getView()));
             }
         }
-        return listNewByCategory;
+        return new CustomNewDTO(listNewByCategory , categoryRepository.findById(categoryId).get());
     }
 
     @Override

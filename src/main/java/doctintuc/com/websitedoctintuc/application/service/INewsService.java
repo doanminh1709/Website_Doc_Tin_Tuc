@@ -18,6 +18,6 @@ public interface INewsService {
     List<News> getLeastNews();
     List<News> paginateHomePage(Integer page , Integer size);
     News setView(Integer id);
-    List<CustomNewDTO> filterNewsByCategory(Integer page , Integer size , String author , String title , Integer categoryId , String filter );
+    CustomNewDTO filterNewsByCategory(Integer page , Integer size , String author , String title , Integer categoryId , String filter );
     List<News> searchNews(Integer page , Integer size , String key);
 }

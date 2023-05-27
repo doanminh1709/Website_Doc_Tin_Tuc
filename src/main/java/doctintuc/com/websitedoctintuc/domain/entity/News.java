@@ -63,13 +63,13 @@ public class News extends AbstractBase {
         this.setView(0);
     }
 
-    public News(int id, String title, String content, String author, String description, String thumbnail, Category category) {
+    public News(int id, String title, String content, String author, String description, String thumbnail,int view) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.author = author;
         this.description = description;
         this.thumbnail = thumbnail;
-        this.category = category;
+        this.view = view;
     }
 }
