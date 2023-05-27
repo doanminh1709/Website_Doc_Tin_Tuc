@@ -61,13 +61,13 @@ public class UserServiceImpl implements IUserService {
             }
             //Check current login
             String createBy;
-            if (getPrincipal.getCurrentPrincipal() != null){
-                if (getPrincipal.getCurrentPrincipal().equals(EnumRole.ROLE_ADMIN.toString())){
+            if (getPrincipal.getCurrentPrincipal() != null) {
+                if (getPrincipal.getCurrentPrincipal().equals(EnumRole.ROLE_ADMIN.toString())) {
                     createBy = CommonConstant.ROLE__ADMIN;
-                }else{
+                } else {
                     createBy = CommonConstant.ROLE_SUPER_ADMIN;
                 }
-            }else{
+            } else {
                 createBy = CommonConstant.ROLE_USER;
             }
             User account = new User();
@@ -93,7 +93,6 @@ public class UserServiceImpl implements IUserService {
 //            account = modelMapper.map(accountDTO, User.class);
             account.setBirthday(birthday);
             account.setCreateBy(createBy);
-//            account.setLastModifiedBy(CommonConstant.ROLE_SUPER_ADMIN);
             account.setPassword(new BCryptPasswordEncoder().encode(accountDTO.getPassword()));
             account.setRole(roleRepository.findRoleByRoleName(EnumRole.ROLE_USER));
 
@@ -124,13 +123,13 @@ public class UserServiceImpl implements IUserService {
             if (findAccount.get().getUsername().equals(accountDTO.getUsername()) ||
                     !userRepository.existsByUsername(accountDTO.getUsername())) {
                 String lastModifiedBy;
-                if (getPrincipal.getCurrentPrincipal() != null){
-                    if (getPrincipal.getCurrentPrincipal().equals(EnumRole.ROLE_ADMIN.toString())){
+                if (getPrincipal.getCurrentPrincipal() != null) {
+                    if (getPrincipal.getCurrentPrincipal().equals(EnumRole.ROLE_ADMIN.toString())) {
                         lastModifiedBy = CommonConstant.ROLE__ADMIN;
-                    }else{
+                    } else {
                         lastModifiedBy = CommonConstant.ROLE_SUPER_ADMIN;
                     }
-                }else{
+                } else {
                     lastModifiedBy = CommonConstant.ROLE_USER;
                 }
                 Date birthday = null;
@@ -193,10 +192,9 @@ public class UserServiceImpl implements IUserService {
                     user.getAvatar(),
                     accessToken, role);
         } catch (BadCredentialsException e) {
-            log.error(String.valueOf(e));
             SecurityContextHolder.clearContext();
+            throw new VsException(DevMessageConstant.Common.LOGIN_FAIL);
         }
-        return null;
     }
 
     @Override

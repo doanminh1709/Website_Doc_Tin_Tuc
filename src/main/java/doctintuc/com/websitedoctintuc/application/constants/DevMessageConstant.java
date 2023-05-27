@@ -6,6 +6,8 @@ public class DevMessageConstant {
         public static final String NOT_FOUND_OBJECT_BY_ID = "Can not found %s with id = %s";
         public static final String OBJECT_IS_EMPTY = "This object is empty ";
         public static final String LOGOUT = "Logout successfully";
+        public static final String  LOGIN_FAIL= "Login fail, please check your username and password!";
+
         public static final String WRITE_DATA_SUCCESS = "Write data to excel file success";
         public static final String WRITE_DATA_FAILED = "Write data to excel file success";
         public static final String SEARCH_ONLY_FIELD = "You can only search on one field";
