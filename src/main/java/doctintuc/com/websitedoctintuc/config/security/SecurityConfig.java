@@ -46,6 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .exceptionHandling().authenticationEntryPoint(authEntryPointJwt).and()
                 .authorizeRequests()
+                .antMatchers("/api/v1/admin/search-all-not-paginate").hasAnyRole("ADMIN" , "SUPER_ADMIN")
                 .anyRequest().permitAll()
                 .and().addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class).
                 csrf().disable().cors().configurationSource(new CorsConfigurationSource() {

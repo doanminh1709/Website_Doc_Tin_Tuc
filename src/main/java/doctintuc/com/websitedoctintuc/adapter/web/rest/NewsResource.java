@@ -29,7 +29,7 @@ public interface NewsResource {
                                 @RequestParam(name = "page", required = false, defaultValue = "10") Integer size);
 
     @ApiOperation(value = "Search all news")
-    @GetMapping("/no-auth/search-all-not-paginate")
+    @GetMapping("/admin/search-all-not-paginate")
     ResponseEntity<?> searchAllNotPaginate();
 
     @ApiOperation(value = "Delete news by id")
