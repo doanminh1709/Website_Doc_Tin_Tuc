@@ -48,7 +48,7 @@ public interface NewsResource {
     @ApiOperation(value = "Paginate home page")
     @GetMapping("/no-auth/paginate-home")
     ResponseEntity<?> paginateHomePage(@RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
-                                       @RequestParam(name = "page-size", required = false, defaultValue = "10") Integer size);
+                                       @RequestParam(name = "size", required = false, defaultValue = "10") Integer size);
 
     @ApiOperation(value = "Update view count")
     @GetMapping("/no-auth/set-view/{id}")
