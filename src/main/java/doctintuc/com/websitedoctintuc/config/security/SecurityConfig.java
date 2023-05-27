@@ -22,6 +22,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -46,11 +47,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().authenticationEntryPoint(authEntryPointJwt).and()
                 .authorizeRequests()
                 .anyRequest().permitAll()
-                .and()
-                .addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class)
-                .csrf().disable()
-                .cors().disable();
+                .and().addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class).
+                csrf().disable().cors().configurationSource(new CorsConfigurationSource() {
+                    @Override
+                    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                        CorsConfiguration configuration = new CorsConfiguration();
+                        configuration.setAllowedOrigins(Arrays.asList("*"));
+                        configuration.setAllowedMethods(Arrays.asList("*"));
+                        configuration.setAllowedHeaders(Arrays.asList("*"));
+                        return configuration;
+                    }
+                }).and().httpBasic().disable().formLogin().disable();
     }
+
     @Bean
     @Override
     protected AuthenticationManager authenticationManager() throws Exception {
