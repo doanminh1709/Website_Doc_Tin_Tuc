@@ -28,6 +28,10 @@ public interface NewsResource {
     ResponseEntity<?> searchAll(@RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
                                 @RequestParam(name = "page", required = false, defaultValue = "10") Integer size);
 
+    @ApiOperation(value = "Search all news")
+    @GetMapping("/no-auth/search-all-not-paginate")
+    ResponseEntity<?> searchAllNotPaginate();
+
     @ApiOperation(value = "Delete news by id")
     @GetMapping("/admin/delete/{id}")
     ResponseEntity<?> delete(@PathVariable("id") Integer id);
@@ -50,4 +54,19 @@ public interface NewsResource {
     @GetMapping("/no-auth/set-view/{id}")
     ResponseEntity<?> setView(@PathVariable("id") Integer id);
 
+    @ApiOperation("Filter news by category id")
+    @GetMapping("/no-auth/filter-new/{categoryId}")
+    ResponseEntity<?> filterNewByCategory(@PathVariable(value = "categoryId" ) Integer categoryId,
+                                          @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
+                                          @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
+                                          @RequestParam(name = "author", required = false) String author,
+                                          @RequestParam(name = "title", required = false) String title,
+                                          @RequestParam(name = "filter", required = false) String filter);
+
+
+    @ApiOperation("News search")
+    @GetMapping("/no-auth/search-news")
+    ResponseEntity<?> filterNewByCategory(@RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
+                                          @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
+                                          @RequestParam(name = "key") String key);
 }

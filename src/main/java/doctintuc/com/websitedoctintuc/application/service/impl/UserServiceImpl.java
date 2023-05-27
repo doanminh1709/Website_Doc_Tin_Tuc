@@ -6,12 +6,12 @@ import doctintuc.com.websitedoctintuc.application.constants.EnumRole;
 import doctintuc.com.websitedoctintuc.application.jwt.JwtUtils;
 import doctintuc.com.websitedoctintuc.application.repository.RoleRepository;
 import doctintuc.com.websitedoctintuc.application.repository.UserRepository;
+import doctintuc.com.websitedoctintuc.application.request.LoginRequest;
 import doctintuc.com.websitedoctintuc.application.response.UserResponse;
 import doctintuc.com.websitedoctintuc.application.service.IUserService;
 import doctintuc.com.websitedoctintuc.application.service.user_detail.UserDetailImp;
 import doctintuc.com.websitedoctintuc.config.exception.VsException;
 import doctintuc.com.websitedoctintuc.domain.dto.UserDTO;
-import doctintuc.com.websitedoctintuc.domain.entity.Role;
 import doctintuc.com.websitedoctintuc.domain.entity.User;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -23,14 +23,11 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -154,11 +151,11 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public UserResponse login(String username, String password) {
+    public UserResponse login(LoginRequest loginRequest) {
 
         try {
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(username, password));
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             UserDetailImp user = (UserDetailImp) authentication.getPrincipal();
@@ -171,17 +168,13 @@ public class UserServiceImpl implements IUserService {
                     user.getBirthday(),
                     user.getGender(),
                     user.getAvatar(),
-                    accessToken ,
-                    role);
+                    accessToken, role);
         } catch (BadCredentialsException e) {
             log.error(String.valueOf(e));
             SecurityContextHolder.clearContext();
         }
         return null;
     }
-
-
-
 
     @Override
     public String logout(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {

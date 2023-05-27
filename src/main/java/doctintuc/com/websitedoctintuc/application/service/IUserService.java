@@ -1,5 +1,6 @@
 package doctintuc.com.websitedoctintuc.application.service;
 
+import doctintuc.com.websitedoctintuc.application.request.LoginRequest;
 import doctintuc.com.websitedoctintuc.application.response.UserResponse;
 import doctintuc.com.websitedoctintuc.domain.dto.UserDTO;
 import doctintuc.com.websitedoctintuc.domain.entity.User;
@@ -21,7 +22,7 @@ public interface IUserService {
 
     List<User> searchAll(Integer page, Integer size);
 
-    UserResponse login(String username, String password);
+    UserResponse login(LoginRequest loginRequest);
 
     String logout(Authentication authentication, HttpServletRequest request, HttpServletResponse response);
 

@@ -35,6 +35,11 @@ public class NewsResourceImpl implements NewsResource {
     }
 
     @Override
+    public ResponseEntity<?> searchAllNotPaginate() {
+        return VsResponseUtil.ok(newsService.searAllNotPaginate());
+    }
+
+    @Override
     public ResponseEntity<?> delete(Integer id) {
         return VsResponseUtil.ok(newsService.delete(id));
     }
@@ -57,5 +62,15 @@ public class NewsResourceImpl implements NewsResource {
     @Override
     public ResponseEntity<?> setView(Integer id) {
         return VsResponseUtil.ok(newsService.setView(id));
+    }
+
+    @Override
+    public ResponseEntity<?> filterNewByCategory(Integer categoryId, Integer page, Integer size, String author, String title, String filter) {
+        return VsResponseUtil.ok(newsService.filterNewsByCategory(page, size, author, title, categoryId, filter));
+    }
+
+    @Override
+    public ResponseEntity<?> filterNewByCategory(Integer page, Integer size, String key) {
+        return VsResponseUtil.ok(newsService.searchNews(page, size, key));
     }
 }

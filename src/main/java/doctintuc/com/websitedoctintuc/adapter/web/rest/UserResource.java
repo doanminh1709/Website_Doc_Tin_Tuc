@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 @Validated
 @Api(tags = "Users Resource")
@@ -18,7 +19,7 @@ public interface UserResource {
 
     @ApiOperation(value = "Create new user")
     @PostMapping("/both/create-user")
-    ResponseEntity<?> create(@ModelAttribute UserDTO userDTO);
+    ResponseEntity<?> create(@RequestBody UserDTO userDTO);
 
     @ApiOperation(value = "Get user by id")
     @GetMapping("/both/get-user/{id}")
@@ -40,7 +41,7 @@ public interface UserResource {
 
     @ApiOperation(value = "Login")
     @PostMapping("/both/login")
-    ResponseEntity<?> login(@RequestParam String username , @RequestParam String password);
+    ResponseEntity<?> login(@RequestBody LoginRequest loginRequest);
 
 
     @ApiOperation(value = "logout")

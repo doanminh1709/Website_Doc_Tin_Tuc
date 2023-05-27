@@ -2,6 +2,7 @@ package doctintuc.com.websitedoctintuc.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import doctintuc.com.websitedoctintuc.domain.entity.base.AbstractBase;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.util.Date;
 import java.util.List;
 
@@ -20,16 +22,17 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "users")
 @Entity
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class User extends AbstractBase {
 
     @Column(name = "full_name")
     private String fullName;
 
-    @NotBlank(message = "Username is not null")
-    @Column(name = "username", nullable = false)
+    @Pattern(regexp =  " " , message = "Username is not null")
+    @Column(name = "username", nullable = false , unique = true)
     private String username;
 
-    @NotBlank(message = "Password is not null")
+    @Pattern(regexp =  " " , message = "Password is not null")
     @Column(name = "password", nullable = false)
     private String password;
 
@@ -42,7 +45,6 @@ public class User extends AbstractBase {
 
     @Column(name = "gender")
     private String gender;
-
 
     @Column(name = "phone")
     private String phone;
@@ -69,6 +71,6 @@ public class User extends AbstractBase {
 
     @ManyToOne
     @JoinColumn(name = "role_id", referencedColumnName = "id")
-    @JsonIgnoreProperties("users")//accounts property will ignore when convert to Json or reserve
+    @JsonIgnoreProperties("users")
     private Role role;
 }

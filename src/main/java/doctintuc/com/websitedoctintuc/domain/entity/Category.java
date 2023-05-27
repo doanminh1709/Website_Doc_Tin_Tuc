@@ -1,6 +1,7 @@
 package doctintuc.com.websitedoctintuc.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import doctintuc.com.websitedoctintuc.domain.entity.base.AbstractBase;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,10 +18,11 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "categories")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Category extends AbstractBase {
 
     @NotBlank(message = "Category name is not blank")
-    @Column(name = "category_name")
+    @Column(name = "category_name", nullable = false , unique = true)
     private String categoryName;
 
     @Column(name = "description")

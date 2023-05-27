@@ -55,8 +55,6 @@ public class ExceptionHandlerConfig {
 
     @ExceptionHandler(value = {BindException.class})
     protected ResponseEntity<RestData<?>> handBindingException(BindException ex) {
-//        LOG.error(ex.getMessage(), ex);
-
         String message = "";
         if (ex.getFieldError() != null) {
             try {
@@ -101,7 +99,6 @@ public class ExceptionHandlerConfig {
         String message = messageSource.getMessage("An error occurred", null, LocaleContextHolder.getLocale());
         return VsResponseUtil.error(HttpStatus.BAD_REQUEST, message,
                 exception.getCause() != null ? exception.getCause().getMessage() : exception.getMessage());
-
     }
 
 

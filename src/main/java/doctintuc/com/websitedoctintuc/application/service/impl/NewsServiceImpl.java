@@ -11,11 +11,13 @@ import doctintuc.com.websitedoctintuc.domain.entity.Category;
 import doctintuc.com.websitedoctintuc.domain.entity.News;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -90,6 +92,14 @@ public class NewsServiceImpl implements INewsService {
     }
 
     @Override
+    public List<News> searAllNotPaginate() {
+        if (ObjectUtils.isEmpty(newsRepository.findAll())) {
+            throw new VsException(DevMessageConstant.Common.NO_DATA_SELECTED);
+        }
+        return newsRepository.findAll();
+    }
+
+    @Override
     public String delete(Integer id) {
         if (!newsRepository.existsById(id)) {
             throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID,
@@ -104,11 +114,8 @@ public class NewsServiceImpl implements INewsService {
         if (ObjectUtils.isEmpty(newsRepository.findAll())) {
             throw new VsException(DevMessageConstant.Common.NO_DATA_SELECTED);
         }
-        List<News> favoriteNews = new ArrayList<>();
-        for (News news : newsRepository.favoriteNews()) {
-            favoriteNews.add(new News(news.getId(), news.getTitle(), news.getDescription(), news.getThumbnail()));
-        }
-        return favoriteNews;
+
+        return newsRepository.favoriteNews();
     }
 
     @Override
@@ -124,8 +131,9 @@ public class NewsServiceImpl implements INewsService {
         if (ObjectUtils.isEmpty(newsRepository.findAll())) {
             throw new VsException(DevMessageConstant.Common.NO_DATA_SELECTED);
         }
-        return newsRepository.allNews(PageRequest.of(page, size));
+        return newsRepository.findAll(PageRequest.of(page, size, Sort.by("create_date").descending())).getContent();
     }
+
 
     @Override
     public News setView(Integer id) {
@@ -136,5 +144,28 @@ public class NewsServiceImpl implements INewsService {
         News news = newsRepository.getById(id);
         news.setView(news.getView() + 1);
         return newsRepository.save(news);
+    }
+
+    @Override
+    public List<News> filterNewsByCategory(Integer page, Integer size, String author, String title, Integer categoryId, String filter) {
+        if (!categoryRepository.existsById(categoryId)) {
+            throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID,
+                    CommonConstant.ClassName.CATEGORY_CLASS_NAME, categoryId));
+        }
+        if (!StringUtils.hasText(filter) || filter.equalsIgnoreCase("ASC")) {
+            return newsRepository.filterNewsByCategory(categoryId, title, author, PageRequest.of(page, size, Sort.by("create_date").ascending()));
+        }
+        if (StringUtils.hasText(filter) && filter.equalsIgnoreCase("DESC")) {
+            return newsRepository.filterNewsByCategory(categoryId, title, author, PageRequest.of(page, size, Sort.by("create_date").descending()));
+        }
+        return null;
+    }
+
+    @Override
+    public List<News> searchNews(Integer page, Integer size, String key) {
+        if (!StringUtils.hasText(key)) {
+            throw new VsException(DevMessageConstant.Common.NO_DATA_SELECTED);
+        }
+        return newsRepository.searchNewsByKey("%" + key.toUpperCase(Locale.ROOT).trim() + "%", PageRequest.of(page, size));
     }
 }
