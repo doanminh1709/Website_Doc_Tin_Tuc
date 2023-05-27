@@ -14,13 +14,13 @@ import java.util.List;
 public interface NewsRepository extends JpaRepository<News, Integer> {
     Boolean existsByTitle(String title);
 
-    @Query(value = "SELECT  u.id , u.title , u.description , u.thumbnail FROM news u ORDER BY u.view DESC LIMIT 5" , nativeQuery = true)
+    @Query(value = "SELECT  u.id , u.title , u.description , u.thumbnail FROM News u ORDER BY u.view DESC LIMIT 5" , nativeQuery = true)
     List<News> favoriteNews();
 
-    @Query(value = "SELECT u.id , u.title , u.description , u.thumbnail FROM news u ORDER BY u.create_date DESC LIMIT 7" , nativeQuery = true)
+    @Query(value = "SELECT u.id , u.title , u.description , u.thumbnail FROM News u ORDER BY u.create_date DESC LIMIT 7" , nativeQuery = true)
     List<News> leastNews();
 
-    @Query(value = "SELECT u.id , u.title , u.description , u.thumbnail FROM  news  u ORDER BY u.create_date" , nativeQuery = true)
+    @Query(value = "SELECT u.id , u.title , u.description , u.thumbnail FROM  News  u ORDER BY u.create_date" , nativeQuery = true)
     List<News> allNews(Pageable pageable);
 
 

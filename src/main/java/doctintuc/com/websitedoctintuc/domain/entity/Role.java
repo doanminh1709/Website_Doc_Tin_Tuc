@@ -2,6 +2,7 @@ package doctintuc.com.websitedoctintuc.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import doctintuc.com.websitedoctintuc.application.constants.EnumRole;
 import doctintuc.com.websitedoctintuc.domain.entity.base.AbstractBase;
 import lombok.AllArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "roles")
 @Entity
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Role extends AbstractBase {
 
     @Enumerated(EnumType.STRING)

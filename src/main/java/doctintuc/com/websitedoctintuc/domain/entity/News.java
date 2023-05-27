@@ -1,7 +1,7 @@
 package doctintuc.com.websitedoctintuc.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import doctintuc.com.websitedoctintuc.domain.entity.base.AbstractBase;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,34 +19,29 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "news")
 @Entity
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class News extends AbstractBase {
 
     @NotBlank(message = "Title is not blank")
-    @Column(name = "title")
-    @JsonIgnoreProperties
+    @Column(name = "title" , nullable = false , unique = true)
     private String title;
 
     @NotBlank(message = "Content is not blank")
     @Column(name = "content", nullable = false, length = 100000)
-    @JsonIgnoreProperties
     private String content;
 
     @Column(name = "author")
-    @JsonIgnoreProperties
     private String author;
 
     @Column(name = "description")
-    @JsonIgnoreProperties
     private String description;
 
     @NotBlank(message = "Thumbnail is not blank")
     @Column(name = "thumbnail", nullable = false)
-    @JsonIgnoreProperties
     private String thumbnail;
 
     @Min(value = 0)
     @Column(name = "view")
-    @JsonIgnoreProperties
     private int view;
 
 
@@ -59,14 +54,7 @@ public class News extends AbstractBase {
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     private Category category;
 
-    public News(int id, String title, String description, String thumbnail) {
-        this.setId(id);
-        this.title = title;
-        this.description = description;
-        this.thumbnail = thumbnail;
-    }
-
-    public News(String title, String content, String author, String description, String thumbnail ) {
+    public News(String title, String content, String author, String description, String thumbnail) {
         this.title = title;
         this.content = content;
         this.author = author;

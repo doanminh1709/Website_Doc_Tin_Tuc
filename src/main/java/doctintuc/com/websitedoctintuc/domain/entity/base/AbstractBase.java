@@ -1,5 +1,6 @@
 package doctintuc.com.websitedoctintuc.domain.entity.base;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ import java.sql.Timestamp;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class AbstractBase implements Serializable {
 
     private static final long serializableUID = 1L;
