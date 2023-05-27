@@ -154,6 +154,7 @@ public class NewsServiceImpl implements INewsService {
                     CommonConstant.ClassName.CATEGORY_CLASS_NAME, categoryId));
         }
         List<News> listNewByCategory = new ArrayList<>();
+        int totalPage = 0;
         if (!StringUtils.hasText(filter) || filter.equalsIgnoreCase(CommonConstant.SORT_ASC)) {
             List<News> listNews1 = newsRepository.filterNewsByCategory(categoryId, title, author, PageRequest.of(page, size,
                     Sort.by(CommonConstant.SORT_BY_TIME).ascending()));
@@ -163,6 +164,7 @@ public class NewsServiceImpl implements INewsService {
                         item.getAuthor(), item.getDescription(),
                         item.getThumbnail(), item.getView()));
             }
+            totalPage = (int) Math.ceil((double) listNews1.size() / size);
         }
         if (StringUtils.hasText(filter) && filter.equalsIgnoreCase(CommonConstant.SORT_DESC)) {
             List<News> listNews2 = newsRepository.filterNewsByCategory(categoryId, title, author, PageRequest.of(page, size,
@@ -173,8 +175,9 @@ public class NewsServiceImpl implements INewsService {
                         item.getAuthor(), item.getDescription(),
                         item.getThumbnail(), item.getView()));
             }
+            totalPage = (int) Math.ceil((double) listNews2.size() / size);
         }
-        return new CustomNewDTO(listNewByCategory , categoryRepository.findById(categoryId).get());
+        return new CustomNewDTO(listNewByCategory, categoryRepository.findById(categoryId).get(), totalPage);
     }
 
     @Override
