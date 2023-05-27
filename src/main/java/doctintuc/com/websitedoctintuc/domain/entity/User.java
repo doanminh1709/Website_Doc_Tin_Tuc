@@ -28,15 +28,15 @@ public class User extends AbstractBase {
     @Column(name = "full_name")
     private String fullName;
 
-    @Pattern(regexp =  " " , message = "Username is not null")
+//    @Pattern(regexp =  " " , message = "Username is not null")
     @Column(name = "username", nullable = false , unique = true)
     private String username;
 
-    @Pattern(regexp =  " " , message = "Password is not null")
+//    @Pattern(regexp =  " " , message = "Password is not null")
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Email(message = "Email is not valid")
+//    @Email(message = "Email is not valid")
     @Column(name = "email", nullable = false)
     private String email;
 

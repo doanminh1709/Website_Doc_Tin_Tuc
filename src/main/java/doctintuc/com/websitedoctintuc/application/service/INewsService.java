@@ -1,5 +1,6 @@
 package doctintuc.com.websitedoctintuc.application.service;
 
+import doctintuc.com.websitedoctintuc.domain.dto.CustomNewDTO;
 import doctintuc.com.websitedoctintuc.domain.dto.NewsDTO;
 import doctintuc.com.websitedoctintuc.domain.entity.News;
 
@@ -17,6 +18,6 @@ public interface INewsService {
     List<News> getLeastNews();
     List<News> paginateHomePage(Integer page , Integer size);
     News setView(Integer id);
-    List<News> filterNewsByCategory(Integer page , Integer size , String author , String title , Integer categoryId , String filter );
+    List<CustomNewDTO> filterNewsByCategory(Integer page , Integer size , String author , String title , Integer categoryId , String filter );
     List<News> searchNews(Integer page , Integer size , String key);
 }

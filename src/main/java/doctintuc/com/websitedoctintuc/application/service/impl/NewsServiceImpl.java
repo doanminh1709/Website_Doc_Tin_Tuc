@@ -6,6 +6,7 @@ import doctintuc.com.websitedoctintuc.application.repository.CategoryRepository;
 import doctintuc.com.websitedoctintuc.application.repository.NewsRepository;
 import doctintuc.com.websitedoctintuc.application.service.INewsService;
 import doctintuc.com.websitedoctintuc.config.exception.VsException;
+import doctintuc.com.websitedoctintuc.domain.dto.CustomNewDTO;
 import doctintuc.com.websitedoctintuc.domain.dto.NewsDTO;
 import doctintuc.com.websitedoctintuc.domain.entity.Category;
 import doctintuc.com.websitedoctintuc.domain.entity.News;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -131,7 +133,7 @@ public class NewsServiceImpl implements INewsService {
         if (ObjectUtils.isEmpty(newsRepository.findAll())) {
             throw new VsException(DevMessageConstant.Common.NO_DATA_SELECTED);
         }
-        return newsRepository.findAll(PageRequest.of(page, size, Sort.by("create_date").descending())).getContent();
+        return newsRepository.findAll(PageRequest.of(page, size, Sort.by(CommonConstant.SORT_BY_TIME2).descending())).getContent();
     }
 
 
@@ -147,18 +149,35 @@ public class NewsServiceImpl implements INewsService {
     }
 
     @Override
-    public List<News> filterNewsByCategory(Integer page, Integer size, String author, String title, Integer categoryId, String filter) {
+    public List<CustomNewDTO> filterNewsByCategory(Integer page, Integer size, String author, String title, Integer categoryId, String filter) {
         if (!categoryRepository.existsById(categoryId)) {
             throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID,
                     CommonConstant.ClassName.CATEGORY_CLASS_NAME, categoryId));
         }
-        if (!StringUtils.hasText(filter) || filter.equalsIgnoreCase("ASC")) {
-            return newsRepository.filterNewsByCategory(categoryId, title, author, PageRequest.of(page, size, Sort.by("create_date").ascending()));
+        List<CustomNewDTO> listNewByCategory = new ArrayList<>();
+        if (!StringUtils.hasText(filter) || filter.equalsIgnoreCase(CommonConstant.SORT_ASC)) {
+            List<News> listNews1 = newsRepository.filterNewsByCategory(categoryId, title, author, PageRequest.of(page, size,
+                    Sort.by(CommonConstant.SORT_BY_TIME).ascending()));
+            for (News item : listNews1) {
+                listNewByCategory.add(new CustomNewDTO(
+                        item.getId(), item.getTitle(), item.getContent(),
+                        item.getAuthor(), item.getDescription(),
+                        item.getThumbnail(), item.getView(),
+                        categoryRepository.findById(categoryId).get()));
+            }
         }
-        if (StringUtils.hasText(filter) && filter.equalsIgnoreCase("DESC")) {
-            return newsRepository.filterNewsByCategory(categoryId, title, author, PageRequest.of(page, size, Sort.by("create_date").descending()));
+        if (StringUtils.hasText(filter) && filter.equalsIgnoreCase(CommonConstant.SORT_DESC)) {
+            List<News> listNews2 = newsRepository.filterNewsByCategory(categoryId, title, author, PageRequest.of(page, size,
+                    Sort.by(CommonConstant.SORT_BY_TIME).descending()));
+            for (News item : listNews2) {
+                listNewByCategory.add(new CustomNewDTO(
+                        item.getId(), item.getTitle(), item.getContent(),
+                        item.getAuthor(), item.getDescription(),
+                        item.getThumbnail(), item.getView(),
+                        categoryRepository.findById(categoryId).get()));
+            }
         }
-        return null;
+        return listNewByCategory;
     }
 
     @Override

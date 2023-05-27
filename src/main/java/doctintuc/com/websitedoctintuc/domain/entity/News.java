@@ -23,7 +23,7 @@ import java.util.List;
 public class News extends AbstractBase {
 
     @NotBlank(message = "Title is not blank")
-    @Column(name = "title" , nullable = false , unique = true)
+    @Column(name = "title", nullable = false, unique = true)
     private String title;
 
     @NotBlank(message = "Content is not blank")
@@ -61,5 +61,15 @@ public class News extends AbstractBase {
         this.description = description;
         this.thumbnail = thumbnail;
         this.setView(0);
+    }
+
+    public News(int id, String title, String content, String author, String description, String thumbnail, Category category) {
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.author = author;
+        this.description = description;
+        this.thumbnail = thumbnail;
+        this.category = category;
     }
 }
