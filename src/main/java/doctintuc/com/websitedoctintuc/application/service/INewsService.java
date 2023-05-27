@@ -1,6 +1,7 @@
 package doctintuc.com.websitedoctintuc.application.service;
 
 import doctintuc.com.websitedoctintuc.domain.dto.NewsDTO;
+import doctintuc.com.websitedoctintuc.domain.dto.NewsHomeDTO;
 import doctintuc.com.websitedoctintuc.domain.entity.News;
 
 import java.util.List;

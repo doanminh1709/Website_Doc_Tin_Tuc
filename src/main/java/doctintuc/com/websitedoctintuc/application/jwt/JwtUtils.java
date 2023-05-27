@@ -14,11 +14,11 @@ public class JwtUtils {
 
     private static final Logger log = LoggerFactory.getLogger(JwtUtils.class);
 
-    @Value("${jwt.secret}")
-    private static String secretKey;
+//    @Value("${jwt.secret}")
+    private static String secretKey="Password12345@";
 
-    @Value("${jwt.time}")
-    private static Long dueTime;
+//    @Value("${jwt.time}")
+    private static Long dueTime = 180000L;
 
 
     public String generateTokenByUsername(String username) {

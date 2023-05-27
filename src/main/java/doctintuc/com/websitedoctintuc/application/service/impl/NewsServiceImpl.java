@@ -10,11 +10,11 @@ import doctintuc.com.websitedoctintuc.domain.dto.NewsDTO;
 import doctintuc.com.websitedoctintuc.domain.entity.Category;
 import doctintuc.com.websitedoctintuc.domain.entity.News;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -104,7 +104,11 @@ public class NewsServiceImpl implements INewsService {
         if (ObjectUtils.isEmpty(newsRepository.findAll())) {
             throw new VsException(DevMessageConstant.Common.NO_DATA_SELECTED);
         }
-        return newsRepository.favoriteNews();
+        List<News> favoriteNews = new ArrayList<>();
+        for (News news : newsRepository.favoriteNews()) {
+            favoriteNews.add(new News(news.getId(), news.getTitle(), news.getDescription(), news.getThumbnail()));
+        }
+        return favoriteNews;
     }
 
     @Override

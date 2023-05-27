@@ -11,6 +11,7 @@ import doctintuc.com.websitedoctintuc.application.service.IUserService;
 import doctintuc.com.websitedoctintuc.application.service.user_detail.UserDetailImp;
 import doctintuc.com.websitedoctintuc.config.exception.VsException;
 import doctintuc.com.websitedoctintuc.domain.dto.UserDTO;
+import doctintuc.com.websitedoctintuc.domain.entity.Role;
 import doctintuc.com.websitedoctintuc.domain.entity.User;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -21,11 +22,15 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,7 +44,6 @@ import java.util.Optional;
 public class UserServiceImpl implements IUserService {
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
     private final RoleRepository roleRepository;
     private final AuthenticationManager authenticationManager;
@@ -80,7 +84,7 @@ public class UserServiceImpl implements IUserService {
             account.setBirthday(birthday);
             account.setCreateBy(CommonConstant.ROLE_SUPER_ADMIN);
             account.setLastModifiedBy(CommonConstant.ROLE_SUPER_ADMIN);
-            account.setPassword(passwordEncoder.encode(accountDTO.getPassword()));
+            account.setPassword(new BCryptPasswordEncoder().encode(accountDTO.getPassword()));
             account.setRole(roleRepository.findRoleByRoleName(EnumRole.ROLE_USER));
 
             return userRepository.save(account);
@@ -124,7 +128,7 @@ public class UserServiceImpl implements IUserService {
                 account.setAvatar(accountDTO.getAvatar());
                 account.setId(id);
                 account.setCreateBy(findAccount.get().getCreateBy());
-                account.setPassword(passwordEncoder.encode(accountDTO.getPassword()));
+                account.setPassword(new BCryptPasswordEncoder().encode(accountDTO.getPassword()));
                 return userRepository.save(account);
             } else {
                 throw new VsException(String.format(DevMessageConstant.Common.EXITS_USERNAME,
@@ -154,11 +158,12 @@ public class UserServiceImpl implements IUserService {
 
         try {
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken("test123", "123"));
+                    new UsernamePasswordAuthenticationToken(username, password));
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             UserDetailImp user = (UserDetailImp) authentication.getPrincipal();
             String accessToken = jwtUtils.generateTokenByUsername(user.getUsername());
+            List<String> role = user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
             return new UserResponse(
                     user.getId(),
                     user.getFullName(),
@@ -166,13 +171,17 @@ public class UserServiceImpl implements IUserService {
                     user.getBirthday(),
                     user.getGender(),
                     user.getAvatar(),
-                    accessToken);
+                    accessToken ,
+                    role);
         } catch (BadCredentialsException e) {
             log.error(String.valueOf(e));
             SecurityContextHolder.clearContext();
         }
         return null;
     }
+
+
+
 
     @Override
     public String logout(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {

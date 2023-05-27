@@ -19,8 +19,4 @@ public class WebsiteDocTinTucApplication {
         return new Slugify();
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 }

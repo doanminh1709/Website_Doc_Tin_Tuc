@@ -31,23 +31,26 @@ public class UserDetailImp implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailImp(int id, String fullName, String email, String birthday, String gender,
-                         String avatar, Collection<? extends GrantedAuthority> authorities) {
-        this.id = id;
-        this.fullName = fullName;
-        this.email = email;
-        this.birthday = birthday;
-        this.gender = gender;
-        this.avatar = avatar;
-        this.authorities = authorities;
-    }
+//    public UserDetailImp(int id, String fullName, String email, String birthday, String gender,
+//                         String avatar,String username , String password, Collection<? extends GrantedAuthority> authorities) {
+//        this.id = id;
+//        this.fullName = fullName;
+//        this.email = email;
+//        this.birthday = birthday;
+//        this.gender = gender;
+//        this.avatar = avatar;
+//        this.username = username;
+//        this.password = password;
+//        this.authorities = authorities;
+//    }
 
     public static UserDetailImp map(User user) {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(user.getRole().getRoleName().name()));
         return new UserDetailImp(user.getId(), user.getFullName(),
                 user.getEmail(), user.getBirthday().toString(),
-                user.getGender(), user.getAvatar(), authorities);
+                user.getGender(), user.getAvatar(),user.getUsername() , user.getPassword(),
+                authorities);
     }
 
     @Override

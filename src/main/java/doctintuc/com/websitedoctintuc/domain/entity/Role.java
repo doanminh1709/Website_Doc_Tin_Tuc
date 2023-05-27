@@ -24,7 +24,6 @@ public class Role extends AbstractBase {
     @Column(name = "role_name")
     private EnumRole roleName;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "role" , cascade = CascadeType.MERGE)
     @JsonIgnoreProperties("role")
     private List<User> users;

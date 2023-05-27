@@ -1,6 +1,7 @@
 package doctintuc.com.websitedoctintuc.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import doctintuc.com.websitedoctintuc.domain.entity.base.AbstractBase;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,29 +23,36 @@ public class News extends AbstractBase {
 
     @NotBlank(message = "Title is not blank")
     @Column(name = "title")
+    @JsonIgnoreProperties
     private String title;
 
     @NotBlank(message = "Content is not blank")
     @Column(name = "content", nullable = false, length = 100000)
+    @JsonIgnoreProperties
     private String content;
 
     @Column(name = "author")
+    @JsonIgnoreProperties
     private String author;
 
     @Column(name = "description")
+    @JsonIgnoreProperties
     private String description;
 
     @NotBlank(message = "Thumbnail is not blank")
     @Column(name = "thumbnail", nullable = false)
+    @JsonIgnoreProperties
     private String thumbnail;
 
     @Min(value = 0)
     @Column(name = "view")
+    @JsonIgnoreProperties
     private int view;
 
+
+    @JsonIgnore
     @OneToMany(mappedBy = "news", fetch = FetchType.EAGER, cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     private List<Comment> comments;
-
 
     @JsonIgnore
     @ManyToOne
