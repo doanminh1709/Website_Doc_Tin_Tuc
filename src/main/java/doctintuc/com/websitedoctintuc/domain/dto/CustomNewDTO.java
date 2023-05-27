@@ -18,4 +18,6 @@ public class CustomNewDTO {
     private List<News> newsList;
 
     private Category category;
+
+    private int totalPage;
 }
