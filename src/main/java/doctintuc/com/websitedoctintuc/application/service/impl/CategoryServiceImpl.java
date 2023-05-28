@@ -45,7 +45,7 @@ public class CategoryServiceImpl implements ICategoryService {
     @Override
     public PaginateDTO<Category> searchPageCategory(Integer page, Integer size) {
         int totalPage = (int) Math.ceil((double) repository.count() / size);
-        return new PaginateDTO<>(repository.findAll(PageRequest.of(page, size, Sort.by(CommonConstant.SORT_BY_TIME)
+        return new PaginateDTO<>(repository.findAll(PageRequest.of(page, size, Sort.by(CommonConstant.SORT_BY_TIME2)
                 .descending())).getContent(), page, totalPage);
     }
 
@@ -77,7 +77,7 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     public List<Category> searchAllCategory() {
-        return repository.findAll(Sort.by("createDate").descending());
+        return repository.findAll(Sort.by(CommonConstant.SORT_BY_TIME2).descending());
     }
 
 }

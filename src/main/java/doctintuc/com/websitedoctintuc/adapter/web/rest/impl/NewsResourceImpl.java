@@ -35,6 +35,11 @@ public class NewsResourceImpl implements NewsResource {
     }
 
     @Override
+    public ResponseEntity<?> searchAllNewsByAdmin(Integer page, Integer size) {
+        return VsResponseUtil.ok(newsService.searchAll(page, size));
+    }
+
+    @Override
     public ResponseEntity<?> searchAllNotPaginate() {
         return VsResponseUtil.ok(newsService.searAllNotPaginate());
     }
