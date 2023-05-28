@@ -163,7 +163,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public PaginateDTO<User> searchAll(Integer page, Integer size) {
         int totalPage = (int) Math.ceil((double) userRepository.count() / size);
-        return new PaginateDTO<>(userRepository.findAll(PageRequest.of(page, size, Sort.by(CommonConstant.SORT_BY_TIME)
+        return new PaginateDTO<>(userRepository.findAll(PageRequest.of(page, size, Sort.by(CommonConstant.SORT_BY_TIME2)
                 .descending())).getContent(), page, totalPage);
     }
 

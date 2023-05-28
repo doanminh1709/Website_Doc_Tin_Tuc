@@ -46,8 +46,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .exceptionHandling().authenticationEntryPoint(authEntryPointJwt).and()
                 .authorizeRequests()
-                .antMatchers("/api/v1/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
-                .antMatchers("/api/v1/both/**").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN")
+                .antMatchers("/api/v1/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPER_ADMIN")
+                .antMatchers("/api/v1/both/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN", "ROLE_SUPER_ADMIN")
                 .antMatchers("/api/v1/user/**").hasRole("USER")
                 .antMatchers("/api/v1/no-auth/**").permitAll().
                 anyRequest().authenticated()

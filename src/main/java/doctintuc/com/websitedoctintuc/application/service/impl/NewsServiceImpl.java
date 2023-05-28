@@ -93,8 +93,8 @@ public class NewsServiceImpl implements INewsService {
     public PaginateDTO<News> searchAll(Integer page, Integer size) {
         int totalPage = (int) Math.ceil((double) newsRepository.count() / size);
         return new PaginateDTO<>(
-                newsRepository.findAll(PageRequest.of(page, size)).getContent(),
-                page, totalPage);
+                newsRepository.findAll(PageRequest.of(page, size, Sort.by(CommonConstant.SORT_BY_TIME2).descending()))
+                        .getContent(), page, totalPage);
     }
 
     @Override

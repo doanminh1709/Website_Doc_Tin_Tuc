@@ -24,9 +24,15 @@ public interface NewsResource {
     ResponseEntity<?> update(@PathVariable("id") Integer id, @RequestBody NewsDTO newsDTO);
 
     @ApiOperation(value = "Search all news")
-    @GetMapping("/no-auth/search-all")
+    @GetMapping("/no-auth/search-all_news")
     ResponseEntity<?> searchAll(@RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
                                 @RequestParam(name = "page", required = false, defaultValue = "10") Integer size);
+
+
+    @ApiOperation(value = "Search all news by admin")
+    @GetMapping("/admin/search-all_news")
+    ResponseEntity<?> searchAllNewsByAdmin(@RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
+                                           @RequestParam(name = "page", required = false, defaultValue = "10") Integer size);
 
     @ApiOperation(value = "Search all news")
     @GetMapping("/admin/search-all-not-paginate")
