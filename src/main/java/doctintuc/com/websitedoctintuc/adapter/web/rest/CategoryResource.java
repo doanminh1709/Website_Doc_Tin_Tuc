@@ -26,12 +26,12 @@ public interface CategoryResource {
     ResponseEntity<?> getCategory(@PathVariable("id") Integer id);
 
     @ApiOperation(value = "Edit category by id")
-    @PatchMapping("/admin/update-category/{id}")
+    @PostMapping("/admin/update-category/{id}")
     ResponseEntity<?> updateCategory(@PathVariable("id") Integer id,
                                      @RequestBody(required = false) CategoryDTO request);
 
-    @ApiOperation(value = "Get category by id")
-    @DeleteMapping("/admin/delete-category/{id}")
+    @ApiOperation(value = "Delete category by id")
+    @PostMapping("/admin/delete-category/{id}")
     ResponseEntity<?> deleteCategory(@PathVariable("id") Integer id);
 
     @ApiOperation(value = "Get all category")

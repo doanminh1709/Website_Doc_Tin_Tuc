@@ -20,6 +20,7 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -162,7 +163,8 @@ public class UserServiceImpl implements IUserService {
     @Override
     public PaginateDTO<User> searchAll(Integer page, Integer size) {
         int totalPage = (int) Math.ceil((double) userRepository.count() / size);
-        return new PaginateDTO<>(userRepository.findAll(PageRequest.of(page, size)).getContent(), page, totalPage);
+        return new PaginateDTO<>(userRepository.findAll(PageRequest.of(page, size, Sort.by(CommonConstant.SORT_BY_TIME)
+                .descending())).getContent(), page, totalPage);
     }
 
     @Override

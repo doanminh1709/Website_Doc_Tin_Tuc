@@ -20,7 +20,7 @@ public interface NewsResource {
     ResponseEntity<?> get(@PathVariable("id") Integer id);
 
     @ApiOperation(value = "Get news by id")
-    @PatchMapping("/admin/update/{id}")
+    @PostMapping("/admin/update/{id}")
     ResponseEntity<?> update(@PathVariable("id") Integer id, @RequestBody NewsDTO newsDTO);
 
     @ApiOperation(value = "Search all news")
