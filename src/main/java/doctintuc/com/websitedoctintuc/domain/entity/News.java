@@ -12,18 +12,17 @@ import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
-
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "news")
-@Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class News extends AbstractBase {
 
     @NotBlank(message = "Title is not blank")
-    @Column(name = "title", nullable = false, unique = true)
+    @Column(name = "title", nullable = false, unique = true , length = 100000)
     private String title;
 
     @NotBlank(message = "Content is not blank")

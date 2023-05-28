@@ -20,37 +20,12 @@ import java.util.List;
 @AllArgsConstructor
 @Service
 public class UserDetailImp implements UserDetails {
-    private int id;
-    private String fullName;
-    private String email;
-    private String birthday;
-    private String gender;
-    private String avatar;
-    private String username;
-    private String password;
-
+    private User user;
     private Collection<? extends GrantedAuthority> authorities;
-
-//    public UserDetailImp(int id, String fullName, String email, String birthday, String gender,
-//                         String avatar,String username , String password, Collection<? extends GrantedAuthority> authorities) {
-//        this.id = id;
-//        this.fullName = fullName;
-//        this.email = email;
-//        this.birthday = birthday;
-//        this.gender = gender;
-//        this.avatar = avatar;
-//        this.username = username;
-//        this.password = password;
-//        this.authorities = authorities;
-//    }
-
     public static UserDetailImp map(User user) {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(user.getRole().getRoleName().name()));
-        return new UserDetailImp(user.getId(), user.getFullName(),
-                user.getEmail(), user.getBirthday().toString(),
-                user.getGender(), user.getAvatar(),user.getUsername() , user.getPassword(),
-                authorities);
+        return new UserDetailImp(user, authorities);
     }
 
     @Override
@@ -60,12 +35,12 @@ public class UserDetailImp implements UserDetails {
 
     @Override
     public String getPassword() {
-        return password;
+        return user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return username;
+        return user.getUsername();
     }
 
     @Override

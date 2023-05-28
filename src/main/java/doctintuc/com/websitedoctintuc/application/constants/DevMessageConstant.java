@@ -7,14 +7,13 @@ public class DevMessageConstant {
         public static final String OBJECT_IS_EMPTY = "This object is empty ";
         public static final String LOGOUT = "Logout successfully";
         public static final String  LOGIN_FAIL= "Login fail, please check your username and password!";
-
         public static final String WRITE_DATA_SUCCESS = "Write data to excel file success";
         public static final String WRITE_DATA_FAILED = "Write data to excel file success";
         public static final String SEARCH_ONLY_FIELD = "You can only search on one field";
         public static final String CHECK_FIELD = "You need to enter data at least 1 of 2 the field ";
         public static final String GET_REFRESH_TOKEN = "Get refresh token failed!";
         public static final String EXPORT_FILE = "Progress export file success";
-        public static final String REGISTER_FAILED = "Register failed!";
+        public static final String REGISTER_FAILED = "Register failed : The error is : %s";
         public static final String REGISTER_SUCCESS = "Sent request register account success!";
         public static final String CONFIRM_SUCCESSFUL = "Confirm account successful!";
         public static final String TOKEN_EXPIRED = "This token is expired!";

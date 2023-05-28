@@ -4,11 +4,11 @@ import doctintuc.com.websitedoctintuc.application.request.LoginRequest;
 import doctintuc.com.websitedoctintuc.application.response.UserResponse;
 import doctintuc.com.websitedoctintuc.domain.dto.UserDTO;
 import doctintuc.com.websitedoctintuc.domain.entity.User;
+import doctintuc.com.websitedoctintuc.domain.pagine.PaginateDTO;
 import org.springframework.security.core.Authentication;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 
 public interface IUserService {
 
@@ -20,7 +20,7 @@ public interface IUserService {
 
     String delete(int id);
 
-    List<User> searchAll(Integer page, Integer size);
+    PaginateDTO<User> searchAll(Integer page, Integer size);
 
     UserResponse login(LoginRequest loginRequest);
 

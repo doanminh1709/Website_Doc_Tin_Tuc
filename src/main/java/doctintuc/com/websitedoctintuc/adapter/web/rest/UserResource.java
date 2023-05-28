@@ -11,14 +11,13 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 
 @Validated
 @Api(tags = "Users Resource")
 public interface UserResource {
 
     @ApiOperation(value = "Create new user")
-    @PostMapping("/both/create-user")
+    @PostMapping("/no-auth/create-user")
     ResponseEntity<?> create(@RequestBody UserDTO userDTO);
 
     @ApiOperation(value = "Get user by id")
@@ -35,12 +34,12 @@ public interface UserResource {
 
     @ApiOperation(value = "Search all user")
     @GetMapping("/admin/search-all")
-    ResponseEntity<?> searchAll(@RequestParam(name = "page" , required = false, defaultValue = "0") Integer page,
-                                @RequestParam(name = "size" , required = false, defaultValue = "10") Integer size);
+    ResponseEntity<?> searchAll(@RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
+                                @RequestParam(name = "size", required = false, defaultValue = "10") Integer size);
 
 
     @ApiOperation(value = "Login")
-    @PostMapping("/both/login")
+    @PostMapping("/no-auth/login")
     ResponseEntity<?> login(@RequestBody LoginRequest loginRequest);
 
 

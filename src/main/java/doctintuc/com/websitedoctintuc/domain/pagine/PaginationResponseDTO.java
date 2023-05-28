@@ -8,5 +8,5 @@ import lombok.*;
 public class PaginationResponseDTO<T> {
     private Integer status;
     private String message;
-    private PaginationDTO<T> result;
+    private PaginateDTO<T> result;
 }

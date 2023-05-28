@@ -2,11 +2,13 @@ package doctintuc.com.websitedoctintuc.domain.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
 public class UserDTO {
+    @NotBlank(message = "FullName is not blank")
     private String fullName;
     private String username;
     private String password;

@@ -19,9 +19,12 @@ public interface NewsRepository extends JpaRepository<News, Integer> {
     List<News> leastNews();
 
     @Query(value = "SELECT * FROM news u WHERE u.category_id = ?1 or u.title = ?2 or u.author LIKE ?3", nativeQuery = true)
-    List<News> filterNewsByCategory(Integer categoryId, String title, String author , Pageable pageable);
+    List<News> filterNewsByCategory(Integer categoryId, String title, String author, Pageable pageable);
 
     @Query(value = "SELECT * FROM news u  WHERE u.title LIKE :key OR u.description LIKE :key", nativeQuery = true)
-    List<News> searchNewsByKey(String key , Pageable pageable);
+    List<News> searchNewsByKey(String key, Pageable pageable);
+
+    @Query(value = "SELECT COUNT(*) FROM news", nativeQuery = true)
+    Integer countRecordNews();
 
 }
