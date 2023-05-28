@@ -11,12 +11,11 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
-
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 @Table(name = "categories")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Category extends AbstractBase {

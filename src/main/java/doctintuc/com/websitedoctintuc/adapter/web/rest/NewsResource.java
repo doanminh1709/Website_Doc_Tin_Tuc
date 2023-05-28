@@ -56,7 +56,7 @@ public interface NewsResource {
 
     @ApiOperation("Filter news by category id")
     @GetMapping("/no-auth/filter-new/{categoryId}")
-    ResponseEntity<?> filterNewByCategory(@PathVariable(value = "categoryId" ) Integer categoryId,
+    ResponseEntity<?> filterNewByCategory(@PathVariable(value = "categoryId") Integer categoryId,
                                           @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
                                           @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
                                           @RequestParam(name = "author", required = false) String author,
@@ -69,4 +69,8 @@ public interface NewsResource {
     ResponseEntity<?> filterNewByCategory(@RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
                                           @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
                                           @RequestParam(name = "key") String key);
+
+    @ApiOperation("Count record news")
+    @GetMapping("/admin/count-record_news")
+    ResponseEntity<?> countRecordNews();
 }

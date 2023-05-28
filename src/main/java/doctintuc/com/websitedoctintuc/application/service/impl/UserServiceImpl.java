@@ -14,6 +14,7 @@ import doctintuc.com.websitedoctintuc.application.utils.GetPrincipal;
 import doctintuc.com.websitedoctintuc.config.exception.VsException;
 import doctintuc.com.websitedoctintuc.domain.dto.UserDTO;
 import doctintuc.com.websitedoctintuc.domain.entity.User;
+import doctintuc.com.websitedoctintuc.domain.pagine.PaginateDTO;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -53,23 +54,27 @@ public class UserServiceImpl implements IUserService {
         if (userRepository.existsByUsername(accountDTO.getUsername())) {
             throw new VsException(String.format(DevMessageConstant.Common.EXITS_USERNAME, accountDTO.getUsername()));
         }
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat(CommonConstant.FORMAT_DATE_PATTERN);
-            Date birthday = null;
-            if (accountDTO.getBirthday() != null) {
+        //Handle data
+        SimpleDateFormat sdf = new SimpleDateFormat(CommonConstant.FORMAT_DATE_PATTERN);
+        Date birthday = null;
+        if (accountDTO.getBirthday() != null) {
+            try {
                 birthday = sdf.parse(accountDTO.getBirthday());
+            } catch (Exception e) {
+                log.error(e.getMessage());
             }
-            //Check current login
-            String createBy;
-            if (getPrincipal.getCurrentPrincipal() != null) {
-                if (getPrincipal.getCurrentPrincipal().equals(EnumRole.ROLE_ADMIN.toString())) {
-                    createBy = CommonConstant.ROLE__ADMIN;
-                } else {
-                    createBy = CommonConstant.ROLE_SUPER_ADMIN;
-                }
+        }
+        String createBy;
+        if (getPrincipal.getCurrentPrincipal() != null) {
+            if (getPrincipal.getCurrentPrincipal().equals(EnumRole.ROLE_ADMIN.toString())) {
+                createBy = CommonConstant.ROLE__ADMIN;
             } else {
-                createBy = CommonConstant.ROLE_USER;
+                createBy = CommonConstant.ROLE_SUPER_ADMIN;
             }
+        } else {
+            createBy = CommonConstant.ROLE_USER;
+        }
+        try {
             User account = new User();
             account.setEmail(accountDTO.getEmail());
             account.setGender(accountDTO.getGender());
@@ -78,19 +83,6 @@ public class UserServiceImpl implements IUserService {
             account.setUsername(accountDTO.getUsername());
             account.setPhone(accountDTO.getPhone());
             account.setAvatar(accountDTO.getAvatar());
-//            PropertyMap<UserDTO, User> userMap = new PropertyMap<>() {
-//                @Override
-//                protected void configure() {
-//                    skip().setBirthday(null);
-//                    skip().setAvatar(null);
-//                    skip().setCreateBy(null);
-//                    skip().setLastModifiedBy(null);
-//                    skip().setPassword(null);
-//                    skip().setRole(null);
-//                }
-//            };
-//            modelMapper.addMappings(userMap);
-//            account = modelMapper.map(accountDTO, User.class);
             account.setBirthday(birthday);
             account.setCreateBy(createBy);
             account.setPassword(new BCryptPasswordEncoder().encode(accountDTO.getPassword()));
@@ -98,10 +90,10 @@ public class UserServiceImpl implements IUserService {
 
             return userRepository.save(account);
         } catch (Exception e) {
-            log.error(String.valueOf(e));
+            throw new VsException(String.format(DevMessageConstant.Common.REGISTER_FAILED, e));
         }
-        return null;
     }
+
 
     @Override
     public User get(int id) {
@@ -168,8 +160,9 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public List<User> searchAll(Integer page, Integer size) {
-        return userRepository.findAll(PageRequest.of(page, size)).getContent();
+    public PaginateDTO<User> searchAll(Integer page, Integer size) {
+        int totalPage = (int) Math.ceil((double) userRepository.count() / size);
+        return new PaginateDTO<>(userRepository.findAll(PageRequest.of(page, size)).getContent(), page, totalPage);
     }
 
     @Override
@@ -180,16 +173,16 @@ public class UserServiceImpl implements IUserService {
                     new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            UserDetailImp user = (UserDetailImp) authentication.getPrincipal();
-            String accessToken = jwtUtils.generateTokenByUsername(user.getUsername());
-            List<String> role = user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
+            UserDetailImp userDetail = (UserDetailImp) authentication.getPrincipal();
+            String accessToken = jwtUtils.generateTokenByUsername(userDetail.getUsername());
+            List<String> role = userDetail.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
             return new UserResponse(
-                    user.getId(),
-                    user.getFullName(),
-                    user.getEmail(),
-                    user.getBirthday(),
-                    user.getGender(),
-                    user.getAvatar(),
+                    userDetail.getUser().getId(),
+                    userDetail.getUser().getFullName(),
+                    userDetail.getUser().getEmail(),
+                    userDetail.getUser().getBirthday().toString().substring(0, 10),
+                    userDetail.getUser().getGender(),
+                    userDetail.getUser().getAvatar(),
                     accessToken, role);
         } catch (BadCredentialsException e) {
             SecurityContextHolder.clearContext();

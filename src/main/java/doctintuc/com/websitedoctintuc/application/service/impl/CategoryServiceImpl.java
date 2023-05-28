@@ -7,6 +7,7 @@ import doctintuc.com.websitedoctintuc.application.service.ICategoryService;
 import doctintuc.com.websitedoctintuc.config.exception.VsException;
 import doctintuc.com.websitedoctintuc.domain.dto.CategoryDTO;
 import doctintuc.com.websitedoctintuc.domain.entity.Category;
+import doctintuc.com.websitedoctintuc.domain.pagine.PaginateDTO;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
@@ -39,8 +40,9 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     @Override
-    public List<Category> searchPageCategory(Integer page, Integer size) {
-        return repository.findAll(PageRequest.of(page, size)).getContent();
+    public PaginateDTO<Category> searchPageCategory(Integer page, Integer size) {
+        int totalPage = (int)Math.ceil((double) repository.count() / size);
+        return new PaginateDTO<>(repository.findAll(PageRequest.of(page, size)).getContent(), page, totalPage);
     }
 
     @Override

@@ -20,7 +20,7 @@ public class VsException extends RuntimeException {
     private String devMessage;
 
     public VsException(String devMessage) {
-        super(devMessage);//if error return message for dev
+        super(devMessage);
         this.status = HttpStatus.INTERNAL_SERVER_ERROR;
         this.devMessage = devMessage;
     }

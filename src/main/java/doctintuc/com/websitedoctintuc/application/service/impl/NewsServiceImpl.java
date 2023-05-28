@@ -10,6 +10,7 @@ import doctintuc.com.websitedoctintuc.domain.dto.CustomNewDTO;
 import doctintuc.com.websitedoctintuc.domain.dto.NewsDTO;
 import doctintuc.com.websitedoctintuc.domain.entity.Category;
 import doctintuc.com.websitedoctintuc.domain.entity.News;
+import doctintuc.com.websitedoctintuc.domain.pagine.PaginateDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -89,8 +90,11 @@ public class NewsServiceImpl implements INewsService {
     }
 
     @Override
-    public List<News> searchAll(Integer page, Integer size) {
-        return newsRepository.findAll(PageRequest.of(page, size)).getContent();
+    public PaginateDTO<News> searchAll(Integer page, Integer size) {
+        int totalPage = (int) Math.ceil((double) newsRepository.count() / size);
+        return new PaginateDTO<>(
+                newsRepository.findAll(PageRequest.of(page, size)).getContent(),
+                page, totalPage);
     }
 
     @Override
@@ -129,11 +133,12 @@ public class NewsServiceImpl implements INewsService {
     }
 
     @Override
-    public List<News> paginateHomePage(Integer page, Integer size) {
+    public PaginateDTO<News> paginateHomePage(Integer page, Integer size) {
         if (ObjectUtils.isEmpty(newsRepository.findAll())) {
             throw new VsException(DevMessageConstant.Common.NO_DATA_SELECTED);
         }
-        return newsRepository.findAll(PageRequest.of(page, size, Sort.by(CommonConstant.SORT_BY_TIME2).descending())).getContent();
+        return new PaginateDTO<>(newsRepository.findAll(PageRequest.of(page, size,
+                Sort.by(CommonConstant.SORT_BY_TIME2).descending())).getContent(), page, size);
     }
 
     @Override
@@ -181,10 +186,19 @@ public class NewsServiceImpl implements INewsService {
     }
 
     @Override
-    public List<News> searchNews(Integer page, Integer size, String key) {
+    public PaginateDTO<News> searchNews(Integer page, Integer size, String key) {
         if (!StringUtils.hasText(key)) {
             throw new VsException(DevMessageConstant.Common.NO_DATA_SELECTED);
         }
-        return newsRepository.searchNewsByKey("%" + key.toUpperCase(Locale.ROOT).trim() + "%", PageRequest.of(page, size));
+        return new PaginateDTO<>(newsRepository.searchNewsByKey("%" + key.toUpperCase(Locale.ROOT).trim() + "%",
+                PageRequest.of(page, size)), page, size);
+    }
+
+    @Override
+    public Integer countRecordNews() {
+        if (ObjectUtils.isEmpty(newsRepository.findAll())) {
+            return 0;
+        }
+        return newsRepository.countRecordNews();
     }
 }

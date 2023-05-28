@@ -73,4 +73,9 @@ public class NewsResourceImpl implements NewsResource {
     public ResponseEntity<?> filterNewByCategory(Integer page, Integer size, String key) {
         return VsResponseUtil.ok(newsService.searchNews(page, size, key));
     }
+
+    @Override
+    public ResponseEntity<?> countRecordNews() {
+        return VsResponseUtil.ok(newsService.countRecordNews());
+    }
 }
