@@ -25,11 +25,11 @@ public interface UserResource {
     ResponseEntity<?> get(@PathVariable Integer id);
 
     @ApiOperation(value = "Update user")
-    @PatchMapping("/both/update-user/{id}")
+    @PostMapping("/both/update-user/{id}")
     ResponseEntity<?> update(@PathVariable Integer id, @RequestBody UserDTO userDTO);
 
     @ApiOperation(value = "Delete user by id")
-    @DeleteMapping("/admin/delete-user/{id}")
+    @PostMapping("/admin/delete-user/{id}")
     ResponseEntity<?> delete(@PathVariable Integer id);
 
     @ApiOperation(value = "Search all user")

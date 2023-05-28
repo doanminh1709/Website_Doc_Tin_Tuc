@@ -11,8 +11,11 @@ import doctintuc.com.websitedoctintuc.domain.pagine.PaginateDTO;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,8 +44,9 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     public PaginateDTO<Category> searchPageCategory(Integer page, Integer size) {
-        int totalPage = (int)Math.ceil((double) repository.count() / size);
-        return new PaginateDTO<>(repository.findAll(PageRequest.of(page, size)).getContent(), page, totalPage);
+        int totalPage = (int) Math.ceil((double) repository.count() / size);
+        return new PaginateDTO<>(repository.findAll(PageRequest.of(page, size, Sort.by(CommonConstant.SORT_BY_TIME)
+                .descending())).getContent(), page, totalPage);
     }
 
     @Override
@@ -73,6 +77,7 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     public List<Category> searchAllCategory() {
-        return repository.findAll();
+        return repository.findAll(Sort.by("createDate").descending());
     }
+
 }
