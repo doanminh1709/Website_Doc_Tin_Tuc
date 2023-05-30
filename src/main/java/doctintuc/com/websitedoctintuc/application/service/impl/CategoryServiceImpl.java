@@ -14,8 +14,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,13 +52,15 @@ public class CategoryServiceImpl implements ICategoryService {
 
         Optional<Category> found_category = repository.findById(id);
         if (found_category.isPresent()) {
-            if (repository.existsByCategoryName(categoryDTO.getCategoryName())) {
+            if (categoryDTO.getCategoryName().equals(found_category.get().getCategoryName()) ||
+                    !repository.existsByCategoryName(categoryDTO.getCategoryName())) {
+                Optional<Category> category = Optional.ofNullable(modelMapper.map(categoryDTO, Category.class));
+                category.get().setId(id);
+                category.get().setCreateBy(found_category.get().getCreateBy());
+                return repository.save(category.get());
+            } else {
                 throw new VsException(String.format(DevMessageConstant.Common.EXITS_USERNAME, categoryDTO.getCategoryName()));
             }
-            Optional<Category> category = Optional.ofNullable(modelMapper.map(categoryDTO, Category.class));
-            category.get().setId(id);
-            category.get().setCreateBy(found_category.get().getCreateBy());
-            return repository.save(category.get());
         } else {
             throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID, CommonConstant.ClassName.CATEGORY_CLASS_NAME, id));
         }
@@ -77,7 +77,7 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     public List<Category> searchAllCategory() {
-        return repository.findAll(Sort.by(CommonConstant.SORT_BY_TIME2).descending());
+        return repository.findAll(Sort.by(CommonConstant.SORT_BY_TIME2).ascending());
     }
 
 }

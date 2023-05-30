@@ -78,6 +78,7 @@ public class UserServiceImpl implements IUserService {
         try {
             User account = new User();
             account.setEmail(accountDTO.getEmail());
+            log.info(accountDTO.getEmail());
             account.setGender(accountDTO.getGender());
             account.setAddress(accountDTO.getAddress());
             account.setFullName(accountDTO.getFullName());
