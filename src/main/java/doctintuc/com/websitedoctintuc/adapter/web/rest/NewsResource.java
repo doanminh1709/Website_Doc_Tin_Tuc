@@ -1,5 +1,6 @@
 package doctintuc.com.websitedoctintuc.adapter.web.rest;
 
+import doctintuc.com.websitedoctintuc.application.request.UserNewsRequest;
 import doctintuc.com.websitedoctintuc.domain.dto.NewsDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -7,21 +8,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Validated
 @Api(tags = "News Resource")
 public interface NewsResource {
 
     @ApiOperation(value = "Create news")
     @PostMapping("/admin/create-news")
-    ResponseEntity<?> create(@RequestBody NewsDTO newsDTO);
+    ResponseEntity<?> create(@RequestBody NewsDTO newsDTO, HttpServletRequest request);
 
     @ApiOperation(value = "Get news by id")
     @GetMapping("/no-auth/get-news/{id}")
     ResponseEntity<?> get(@PathVariable("id") Integer id);
 
-    @ApiOperation(value = "Get news by id")
+    @ApiOperation(value = "Update news by id")
     @PostMapping("/admin/update/{id}")
-    ResponseEntity<?> update(@PathVariable("id") Integer id, @RequestBody NewsDTO newsDTO);
+    ResponseEntity<?> update(@PathVariable("id") Integer id, @RequestBody NewsDTO newsDTO, HttpServletRequest request);
 
     @ApiOperation(value = "Search all news")
     @GetMapping("/no-auth/search-all_news")
@@ -79,4 +82,12 @@ public interface NewsResource {
     @ApiOperation("Count record news")
     @GetMapping("/admin/count-record_news")
     ResponseEntity<?> countRecordNews();
+
+    @ApiOperation("Save news watched")
+    @GetMapping("/no-auth/save-news-watched")
+    ResponseEntity<?> saveNewsWatched(@RequestBody UserNewsRequest request);
+
+    @ApiOperation("Get all news watched")
+    @GetMapping("/user/get-all-news-watched")
+    ResponseEntity<?> getAllNewsWatched(@RequestBody UserNewsRequest request);
 }

@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Validated
 @Api(tags = "Category Resource")
 public interface CategoryResource {
@@ -18,7 +20,7 @@ public interface CategoryResource {
 
     @ApiOperation(value = "Create new category")
     @PostMapping("/admin/create-category")
-    ResponseEntity<?> createCategory(@RequestBody CategoryDTO request);
+    ResponseEntity<?> createCategory(@RequestBody CategoryDTO categoryDTO , HttpServletRequest request);
 
 
     @ApiOperation(value = "Get category by id")
@@ -28,7 +30,8 @@ public interface CategoryResource {
     @ApiOperation(value = "Edit category by id")
     @PostMapping("/admin/update-category/{id}")
     ResponseEntity<?> updateCategory(@PathVariable("id") Integer id,
-                                     @RequestBody(required = false) CategoryDTO request);
+                                     @RequestBody(required = false) CategoryDTO categoryDTO,
+                                     HttpServletRequest request);
 
     @ApiOperation(value = "Delete category by id")
     @PostMapping("/admin/delete-category/{id}")

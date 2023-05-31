@@ -12,11 +12,11 @@ import javax.servlet.http.HttpServletResponse;
 
 public interface IUserService {
 
-    User create(UserDTO accountDTO);
+    User create(UserDTO accountDTO , HttpServletRequest request);
 
     User get(int id);
 
-    User update(int id, UserDTO accountDTO);
+    User update(int id, UserDTO accountDTO , HttpServletRequest request);
 
     String delete(int id);
 

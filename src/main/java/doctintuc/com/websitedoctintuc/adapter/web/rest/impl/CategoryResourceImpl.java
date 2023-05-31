@@ -8,6 +8,8 @@ import doctintuc.com.websitedoctintuc.domain.dto.CategoryDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestApiV1
 @RequiredArgsConstructor
 public class CategoryResourceImpl implements CategoryResource {
@@ -20,8 +22,8 @@ public class CategoryResourceImpl implements CategoryResource {
     }
 
     @Override
-    public ResponseEntity<?> createCategory(CategoryDTO request) {
-        return VsResponseUtil.ok(categoryService.create(request));
+    public ResponseEntity<?> createCategory(CategoryDTO categoryDTO, HttpServletRequest request) {
+        return VsResponseUtil.ok(categoryService.create(categoryDTO, request));
     }
 
     @Override
@@ -30,8 +32,8 @@ public class CategoryResourceImpl implements CategoryResource {
     }
 
     @Override
-    public ResponseEntity<?> updateCategory(Integer id, CategoryDTO request) {
-        return VsResponseUtil.ok(categoryService.update(id, request));
+    public ResponseEntity<?> updateCategory(Integer id, CategoryDTO categoryDTO, HttpServletRequest request) {
+        return VsResponseUtil.ok(categoryService.update(id, categoryDTO, request));
     }
 
     @Override

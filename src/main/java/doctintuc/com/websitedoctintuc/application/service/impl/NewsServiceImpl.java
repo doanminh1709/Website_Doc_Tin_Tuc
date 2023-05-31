@@ -2,22 +2,28 @@ package doctintuc.com.websitedoctintuc.application.service.impl;
 
 import doctintuc.com.websitedoctintuc.application.constants.CommonConstant;
 import doctintuc.com.websitedoctintuc.application.constants.DevMessageConstant;
+import doctintuc.com.websitedoctintuc.application.jwt.JwtUtils;
 import doctintuc.com.websitedoctintuc.application.repository.CategoryRepository;
 import doctintuc.com.websitedoctintuc.application.repository.NewsRepository;
+import doctintuc.com.websitedoctintuc.application.repository.UserNewsRepository;
+import doctintuc.com.websitedoctintuc.application.repository.UserRepository;
+import doctintuc.com.websitedoctintuc.application.request.UserNewsRequest;
 import doctintuc.com.websitedoctintuc.application.service.INewsService;
 import doctintuc.com.websitedoctintuc.config.exception.VsException;
 import doctintuc.com.websitedoctintuc.domain.dto.CustomNewDTO;
 import doctintuc.com.websitedoctintuc.domain.dto.NewsDTO;
-import doctintuc.com.websitedoctintuc.domain.entity.Category;
-import doctintuc.com.websitedoctintuc.domain.entity.News;
+import doctintuc.com.websitedoctintuc.domain.entity.*;
 import doctintuc.com.websitedoctintuc.domain.pagine.PaginateDTO;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -27,12 +33,15 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class NewsServiceImpl implements INewsService {
 
+    private final static Logger logger = LoggerFactory.getLogger(NewsServiceImpl.class);
     private final NewsRepository newsRepository;
-
     private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;
+    private final JwtUtils jwtUtils;
+    private final UserNewsRepository userNewsRepository;
 
     @Override
-    public News create(NewsDTO newsDTO) {
+    public News create(NewsDTO newsDTO, HttpServletRequest request) {
         if (newsRepository.existsByTitle(newsDTO.getTitle())) {
             throw new VsException(DevMessageConstant.Common.DUPLICATE_NAME, newsDTO.getTitle());
         }
@@ -41,6 +50,9 @@ public class NewsServiceImpl implements INewsService {
             throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID,
                     CommonConstant.ClassName.CATEGORY_CLASS_NAME, newsDTO.getCategoryId()));
         }
+        String authToken = request.getHeader("Authorization").substring(7);
+        String username = jwtUtils.getUserByToken(authToken);
+        User user = userRepository.findByUsername(username);
         News news = new News(
                 newsDTO.getTitle(),
                 newsDTO.getContent(),
@@ -48,6 +60,8 @@ public class NewsServiceImpl implements INewsService {
                 newsDTO.getDescription(),
                 newsDTO.getThumbnail());
         news.setCategory(category.get());
+        news.setCreateBy(user.getFullName());
+        news.setLastModifiedBy(user.getFullName());
         return newsRepository.save(news);
     }
 
@@ -61,7 +75,7 @@ public class NewsServiceImpl implements INewsService {
     }
 
     @Override
-    public News update(Integer id, NewsDTO newsDTO) {
+    public News update(Integer id, NewsDTO newsDTO, HttpServletRequest request) {
 
         Optional<News> foundNews = newsRepository.findById(id);
         if (foundNews.isPresent()) {
@@ -73,6 +87,10 @@ public class NewsServiceImpl implements INewsService {
                 throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID,
                         CommonConstant.ClassName.CATEGORY_CLASS_NAME, newsDTO.getCategoryId()));
             }
+            String authToken = request.getHeader("Authorization").substring(7);
+            String username = jwtUtils.getUserByToken(authToken);
+            User user = userRepository.findByUsername(username);
+
             News news = new News(
                     newsDTO.getTitle(),
                     newsDTO.getContent(),
@@ -81,6 +99,8 @@ public class NewsServiceImpl implements INewsService {
                     newsDTO.getThumbnail()
             );
             news.setId(id);
+            news.setCreateBy(foundNews.get().getCreateBy());
+            news.setLastModifiedBy(user.getFullName());
             news.setCategory(category.get());
             return newsRepository.save(news);
         } else {
@@ -200,5 +220,48 @@ public class NewsServiceImpl implements INewsService {
             return 0;
         }
         return newsRepository.countRecordNews();
+    }
+
+    @Override
+    public News saveNewsWatched(UserNewsRequest request) {
+        if (!newsRepository.existsById(request.getNewsId())) {
+            throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID,
+                    CommonConstant.ClassName.NEWS_CLASS_NAME, request.getNewsId()));
+        } else {
+            News news = newsRepository.findById(request.getNewsId()).get();
+            if (!userRepository.existsById(request.getUserId())) {
+                news.setView(news.getView() + 1);
+                return news;
+            } else {
+                news.setView(news.getView() + 1);
+                RatingKey ratingKey = new RatingKey(request.getUserId(), request.getNewsId());
+                User user = userRepository.findById(request.getUserId()).get();
+                UserNews userNews = new UserNews(ratingKey, user, news);
+                userNewsRepository.save(userNews);
+                return news;
+            }
+        }
+    }
+
+    @Override
+    public List<News> getAllNewWatched(UserNewsRequest request) {
+        if (!newsRepository.existsById(request.getNewsId())) {
+            throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID,
+                    CommonConstant.ClassName.NEWS_CLASS_NAME, request.getNewsId()));
+        } else {
+            List<UserNews> userNews = userNewsRepository.findAll();
+            List<News> listNews = new ArrayList<>();
+            for (UserNews item : userNews) {
+                if (item.getUser().getId() == request.getUserId()) {
+                    News news = newsRepository.findById(item.getNews().getId()).get();
+                    listNews.add(news);
+                }
+            }
+            if (listNews.isEmpty()) {
+                throw new VsException(DevMessageConstant.Common.NO_DATA_SELECTED);
+            } else {
+                return listNews;
+            }
+        }
     }
 }

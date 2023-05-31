@@ -26,8 +26,13 @@ public class UserResourceImpl implements UserResource {
     JwtUtils jwtUtils;
 
     @Override
-    public ResponseEntity<?> create(UserDTO userDTO) {
-        return VsResponseUtil.ok(userService.create(userDTO));
+    public ResponseEntity<?> create(UserDTO userDTO, HttpServletRequest request) {
+        return VsResponseUtil.ok(userService.create(userDTO, request));
+    }
+
+    @Override
+    public ResponseEntity<?> createAccountByAdmin(UserDTO userDTO, HttpServletRequest request) {
+        return VsResponseUtil.ok(userService.create(userDTO, request));
     }
 
     @Override
@@ -35,9 +40,10 @@ public class UserResourceImpl implements UserResource {
         return VsResponseUtil.ok(userService.get(id));
     }
 
+
     @Override
-    public ResponseEntity<?> update(Integer id, UserDTO userDTO) {
-        return VsResponseUtil.ok(userService.update(id, userDTO));
+    public ResponseEntity<?> update(Integer id, UserDTO userDTO, HttpServletRequest request) {
+        return VsResponseUtil.ok(userService.update(id, userDTO, request));
     }
 
     @Override
