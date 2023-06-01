@@ -71,38 +71,47 @@ public class NewsServiceImpl implements INewsService {
     }
 
     @Override
-    public News update(Integer id, NewsDTO newsDTO, HttpServletRequest request) {
+    public News update(int newsId, NewsDTO newsDTO, HttpServletRequest request) {
 
-        Optional<News> foundNews = newsRepository.findById(id);
-        if (foundNews.isPresent()) {
-            if (newsRepository.existsByTitle(newsDTO.getTitle())) {
-                throw new VsException(DevMessageConstant.Common.DUPLICATE_NAME, newsDTO.getTitle());
-            }
-            Optional<Category> category = categoryRepository.findById(newsDTO.getCategoryId());
-            if (category.isEmpty()) {
-                throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID,
-                        CommonConstant.ClassName.CATEGORY_CLASS_NAME, newsDTO.getCategoryId()));
-            }
-            String authToken = request.getHeader("Authorization").substring(7);
-            String username = jwtUtils.getUserByToken(authToken);
-            User user = userRepository.findByUsername(username);
+        if (newsRepository.existsById(newsId)) {
+            String auth = request.getHeader("Authorization");
+            if (auth != null && auth.startsWith("Bearer ")) {
 
-            News news = new News(
-                    newsDTO.getTitle(),
-                    newsDTO.getContent(),
-                    newsDTO.getAuthor(),
-                    newsDTO.getDescription(),
-                    newsDTO.getThumbnail()
-            );
-            news.setId(id);
-            news.setCreateBy(foundNews.get().getCreateBy());
-            news.setLastModifiedBy(user.getFullName());
-            news.setCategory(category.get());
-            return newsRepository.save(news);
+                int idCurrentUser = userRepository.findByUsername(jwtUtils.getUserByToken(auth.substring(7))).getId();
+
+                Optional<News> foundNews = newsRepository.findById(idCurrentUser);
+                if (foundNews.isPresent() && !foundNews.get().getTitle().equals(newsDTO.getTitle())) {
+                    if (newsRepository.existsByTitle(newsDTO.getTitle())) {
+                        throw new VsException(DevMessageConstant.Common.DUPLICATE_NAME, newsDTO.getTitle());
+                    }
+                    Optional<Category> category = categoryRepository.findById(newsDTO.getCategoryId());
+                    if (category.isEmpty()) {
+                        throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID,
+                                CommonConstant.ClassName.CATEGORY_CLASS_NAME, newsDTO.getCategoryId()));
+                    }
+                    String authToken = request.getHeader("Authorization").substring(7);
+                    String username = jwtUtils.getUserByToken(authToken);
+                    User user = userRepository.findByUsername(username);
+
+                    News news = new News(
+                            newsDTO.getTitle(),
+                            newsDTO.getContent(),
+                            newsDTO.getAuthor(),
+                            newsDTO.getDescription(),
+                            newsDTO.getThumbnail()
+                    );
+                    news.setId(idCurrentUser);
+                    news.setCreateBy(foundNews.get().getCreateBy());
+                    news.setLastModifiedBy(user.getFullName());
+                    news.setCategory(category.get());
+                    return newsRepository.save(news);
+                }
+            }
         } else {
             throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID,
-                    CommonConstant.ClassName.NEWS_CLASS_NAME, id));
+                    CommonConstant.ClassName.NEWS_CLASS_NAME, newsId));
         }
+        return null;
     }
 
     @Override
@@ -230,7 +239,7 @@ public class NewsServiceImpl implements INewsService {
                 int idCurrentUser = userRepository.findByUsername(jwtUtils.getUserByToken(auth.substring(7))).getId();
 
                 News news = newsRepository.findById(newsId).get();
-                if (userRepository.existsById(newsId)) {
+                if (userRepository.existsById(idCurrentUser)) {
                     RatingKey ratingKey = new RatingKey(idCurrentUser, newsId);
                     User user = userRepository.findById(idCurrentUser).get();
                     UserNews userNews = new UserNews(ratingKey, user, news);
@@ -246,26 +255,26 @@ public class NewsServiceImpl implements INewsService {
         }
     }
 
-        @Override
-        public List<News> getAllNewWatched (HttpServletRequest request){
+    @Override
+    public List<News> getAllNewWatched(HttpServletRequest request) {
 
-            String authToken = request.getHeader("Authorization").substring(7);
-            String username = jwtUtils.getUserByToken(authToken);
-            User user = userRepository.findByUsername(username);
+        String authToken = request.getHeader("Authorization").substring(7);
+        String username = jwtUtils.getUserByToken(authToken);
+        User user = userRepository.findByUsername(username);
 
 
-            List<UserNews> userNews = userNewsRepository.findAll();
-            List<News> listNews = new ArrayList<>();
-            for (UserNews item : userNews) {
-                if (Objects.equals(item.getUser().getId(), user.getId())) {
-                    News news = newsRepository.findById(item.getNews().getId()).get();
-                    listNews.add(news);
-                }
-            }
-            if (listNews.isEmpty()) {
-                throw new VsException(DevMessageConstant.Common.NO_DATA_SELECTED);
-            } else {
-                return listNews;
+        List<UserNews> userNews = userNewsRepository.findAll();
+        List<News> listNews = new ArrayList<>();
+        for (UserNews item : userNews) {
+            if (Objects.equals(item.getUser().getId(), user.getId())) {
+                News news = newsRepository.findById(item.getNews().getId()).get();
+                listNews.add(news);
             }
         }
+        if (listNews.isEmpty()) {
+            throw new VsException(DevMessageConstant.Common.NO_DATA_SELECTED);
+        } else {
+            return listNews;
+        }
     }
+}

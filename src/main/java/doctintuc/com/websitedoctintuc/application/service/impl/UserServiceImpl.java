@@ -10,7 +10,6 @@ import doctintuc.com.websitedoctintuc.application.request.LoginRequest;
 import doctintuc.com.websitedoctintuc.application.response.UserResponse;
 import doctintuc.com.websitedoctintuc.application.service.IUserService;
 import doctintuc.com.websitedoctintuc.application.service.user_detail.UserDetailImp;
-import doctintuc.com.websitedoctintuc.application.utils.GetPrincipal;
 import doctintuc.com.websitedoctintuc.config.exception.VsException;
 import doctintuc.com.websitedoctintuc.domain.dto.UserDTO;
 import doctintuc.com.websitedoctintuc.domain.entity.User;
@@ -44,7 +43,6 @@ import java.util.Optional;
 public class UserServiceImpl implements IUserService {
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     private final UserRepository userRepository;
-    private final ModelMapper modelMapper;
     private final RoleRepository roleRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
@@ -64,11 +62,15 @@ public class UserServiceImpl implements IUserService {
                 log.error(e.getMessage());
             }
         }
-        String createBy;
+        String createBy = null;
         String auth = request.getHeader("Authorization");
+        boolean flag = false;
         if (auth != null && auth.startsWith("Bearer ")) {
             User user = userRepository.findByUsername(jwtUtils.getUserByToken(auth.substring(7)));
-            createBy = user.getFullName();
+            if (user.getRole().getRoleName().toString().equals("ROLE_SUPER_ADMIN")) {
+                createBy = user.getFullName();
+                flag = true;
+            }
         } else {
             createBy = accountDTO.getFullName();
         }
@@ -86,8 +88,12 @@ public class UserServiceImpl implements IUserService {
             account.setCreateBy(createBy);
             account.setLastModifiedBy(createBy);
             account.setPassword(new BCryptPasswordEncoder().encode(accountDTO.getPassword()));
-            account.setRole(roleRepository.findRoleByRoleName(EnumRole.ROLE_USER));
-
+            if (flag) {
+                account.setRole(roleRepository.findRoleByRoleName(EnumRole.ROLE_ADMIN));
+            }
+            else {
+                account.setRole(roleRepository.findRoleByRoleName(EnumRole.ROLE_USER));
+            }
             return userRepository.save(account);
         } catch (Exception e) {
             throw new VsException(String.format(DevMessageConstant.Common.REGISTER_FAILED, e));

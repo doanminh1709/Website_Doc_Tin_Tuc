@@ -22,8 +22,8 @@ public interface NewsResource {
     ResponseEntity<?> get(@PathVariable("id") Integer id);
 
     @ApiOperation(value = "Update news by id")
-    @PostMapping("/admin/update/{id}")
-    ResponseEntity<?> update(@PathVariable("id") Integer id, @RequestBody NewsDTO newsDTO, HttpServletRequest request);
+    @PostMapping("/admin/update/{newsId}")
+    ResponseEntity<?> update(@PathVariable("newsId") int newsId, @RequestBody NewsDTO newsDTO, HttpServletRequest request);
 
     @ApiOperation(value = "Search all news")
     @GetMapping("/no-auth/search-all_news")
@@ -84,7 +84,7 @@ public interface NewsResource {
 
     @ApiOperation("Save news watched")
     @GetMapping("/no-auth/save-news-watched/{newsId}")
-    ResponseEntity<?> saveNewsWatched(@PathVariable int newsId ,HttpServletRequest request);
+    ResponseEntity<?> saveNewsWatched(@PathVariable int newsId, HttpServletRequest request);
 
     @ApiOperation("Get all news watched")
     @GetMapping("/user/get-all-news-watched")

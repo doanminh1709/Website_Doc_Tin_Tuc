@@ -27,8 +27,8 @@ public class NewsResourceImpl implements NewsResource {
     }
 
     @Override
-    public ResponseEntity<?> update(Integer id, NewsDTO newsDTO, HttpServletRequest request) {
-        return VsResponseUtil.ok(newsService.update(id, newsDTO, request));
+    public ResponseEntity<?> update(int newsId , NewsDTO newsDTO, HttpServletRequest request) {
+        return VsResponseUtil.ok(newsService.update(newsId , newsDTO, request));
     }
 
     @Override
@@ -87,12 +87,12 @@ public class NewsResourceImpl implements NewsResource {
     }
 
     @Override
-    public ResponseEntity<?> saveNewsWatched( int newsId , HttpServletRequest request){
-        return VsResponseUtil.ok(newsService.saveNewsWatched(newsId , request));
+    public ResponseEntity<?> saveNewsWatched(int newsId, HttpServletRequest request) {
+        return VsResponseUtil.ok(newsService.saveNewsWatched(newsId, request));
     }
 
     @Override
-    public ResponseEntity<?> getAllNewsWatched(HttpServletRequest request){
+    public ResponseEntity<?> getAllNewsWatched(HttpServletRequest request) {
         return VsResponseUtil.ok(newsService.getAllNewWatched(request));
     }
 }

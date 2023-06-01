@@ -9,19 +9,33 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface INewsService {
-    News create(NewsDTO newsDTO , HttpServletRequest request);
+    News create(NewsDTO newsDTO, HttpServletRequest request);
+
     News get(Integer id);
-    News update(Integer id, NewsDTO newsDTO , HttpServletRequest request);
+
+    News update(int newsId , NewsDTO newsDTO, HttpServletRequest request);
+
     PaginateDTO<News> searchAll(Integer page, Integer size);
+
     List<News> searAllNotPaginate();
+
     String delete(Integer id);
+
     List<News> getFavoriteNews();
+
     List<News> getLeastNews();
-    PaginateDTO<News> paginateHomePage(Integer page , Integer size);
+
+    PaginateDTO<News> paginateHomePage(Integer page, Integer size);
+
     News setView(Integer id);
-    CustomNewDTO filterNewsByCategory(Integer page , Integer size , String author , String title , Integer categoryId , String filter );
-    PaginateDTO<News> searchNews(Integer page , Integer size , String key);
+
+    CustomNewDTO filterNewsByCategory(Integer page, Integer size, String author, String title, Integer categoryId, String filter);
+
+    PaginateDTO<News> searchNews(Integer page, Integer size, String key);
+
     Integer countRecordNews();
-    News saveNewsWatched(int newsId , HttpServletRequest request);
+
+    News saveNewsWatched(int newsId, HttpServletRequest request);
+
     List<News> getAllNewWatched(HttpServletRequest request);
-    }
+}
