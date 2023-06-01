@@ -29,13 +29,13 @@ public interface NewsResource {
     @ApiOperation(value = "Search all news")
     @GetMapping("/no-auth/search-all_news")
     ResponseEntity<?> searchAll(@RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
-                                @RequestParam(name = "page", required = false, defaultValue = "10") Integer size);
+                                @RequestParam(name = "size", required = false, defaultValue = "10") Integer size);
 
 
     @ApiOperation(value = "Search all news by admin")
     @GetMapping("/admin/search-all_news")
     ResponseEntity<?> searchAllNewsByAdmin(@RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
-                                           @RequestParam(name = "page", required = false, defaultValue = "10") Integer size);
+                                           @RequestParam(name = "size", required = false, defaultValue = "10") Integer size);
 
     @ApiOperation(value = "Search all news")
     @GetMapping("/admin/search-all-not-paginate")
@@ -84,10 +84,10 @@ public interface NewsResource {
     ResponseEntity<?> countRecordNews();
 
     @ApiOperation("Save news watched")
-    @GetMapping("/no-auth/save-news-watched")
+    @PostMapping("/no-auth/save-news-watched")
     ResponseEntity<?> saveNewsWatched(@RequestBody UserNewsRequest request);
 
     @ApiOperation("Get all news watched")
-    @GetMapping("/user/get-all-news-watched")
+    @PostMapping("/user/get-all-news-watched")
     ResponseEntity<?> getAllNewsWatched(@RequestBody UserNewsRequest request);
 }
