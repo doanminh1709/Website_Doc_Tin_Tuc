@@ -27,4 +27,6 @@ public interface NewsRepository extends JpaRepository<News, Integer> {
     @Query(value = "SELECT COUNT(*) FROM news", nativeQuery = true)
     Integer countRecordNews();
 
+    Boolean existsNewsByTitle(String title);
+
 }

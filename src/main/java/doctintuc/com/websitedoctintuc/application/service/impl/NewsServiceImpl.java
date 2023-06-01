@@ -2,6 +2,7 @@ package doctintuc.com.websitedoctintuc.application.service.impl;
 
 import doctintuc.com.websitedoctintuc.application.constants.CommonConstant;
 import doctintuc.com.websitedoctintuc.application.constants.DevMessageConstant;
+import doctintuc.com.websitedoctintuc.application.constants.EnumRole;
 import doctintuc.com.websitedoctintuc.application.jwt.JwtUtils;
 import doctintuc.com.websitedoctintuc.application.repository.CategoryRepository;
 import doctintuc.com.websitedoctintuc.application.repository.NewsRepository;
@@ -73,38 +74,33 @@ public class NewsServiceImpl implements INewsService {
     @Override
     public News update(int newsId, NewsDTO newsDTO, HttpServletRequest request) {
 
-        if (newsRepository.existsById(newsId)) {
+        Optional<News> foundNews = newsRepository.findById(newsId);
+        if (!ObjectUtils.isEmpty(foundNews)) {
             String auth = request.getHeader("Authorization");
             if (auth != null && auth.startsWith("Bearer ")) {
-
-                int idCurrentUser = userRepository.findByUsername(jwtUtils.getUserByToken(auth.substring(7))).getId();
-
-                Optional<News> foundNews = newsRepository.findById(idCurrentUser);
-                if (foundNews.isPresent() && !foundNews.get().getTitle().equals(newsDTO.getTitle())) {
-                    if (newsRepository.existsByTitle(newsDTO.getTitle())) {
-                        throw new VsException(DevMessageConstant.Common.DUPLICATE_NAME, newsDTO.getTitle());
+                User user = userRepository.findByUsername(jwtUtils.getUserByToken(auth.substring(7)));
+                if (user.getRole().getRoleName().toString().equals(EnumRole.ROLE_ADMIN.toString())
+                        || user.getRole().getRoleName().toString().equals(EnumRole.ROLE_SUPER_ADMIN.toString())) {
+                    if (foundNews.get().getTitle().equals(newsDTO.getTitle())
+                            || !newsRepository.existsNewsByTitle(newsDTO.getTitle())) {
+                        News news = new News(
+                                newsDTO.getTitle(),
+                                newsDTO.getContent(),
+                                newsDTO.getAuthor(),
+                                newsDTO.getDescription(),
+                                newsDTO.getThumbnail()
+                        );
+                        news.setId(newsId);
+                        news.setCreateBy(foundNews.get().getCreateBy());
+                        news.setLastModifiedBy(user.getFullName());
+                        news.setCategory(foundNews.get().getCategory());
+                        return newsRepository.save(news);
+                    } else {
+                        throw new VsException(String.format(DevMessageConstant.Common.DUPLICATE_NAME, newsDTO.getTitle()));
                     }
-                    Optional<Category> category = categoryRepository.findById(newsDTO.getCategoryId());
-                    if (category.isEmpty()) {
-                        throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID,
-                                CommonConstant.ClassName.CATEGORY_CLASS_NAME, newsDTO.getCategoryId()));
-                    }
-                    String authToken = request.getHeader("Authorization").substring(7);
-                    String username = jwtUtils.getUserByToken(authToken);
-                    User user = userRepository.findByUsername(username);
-
-                    News news = new News(
-                            newsDTO.getTitle(),
-                            newsDTO.getContent(),
-                            newsDTO.getAuthor(),
-                            newsDTO.getDescription(),
-                            newsDTO.getThumbnail()
-                    );
-                    news.setId(idCurrentUser);
-                    news.setCreateBy(foundNews.get().getCreateBy());
-                    news.setLastModifiedBy(user.getFullName());
-                    news.setCategory(category.get());
-                    return newsRepository.save(news);
+                } else {
+                    logger.error("Not authoz");
+                    throw new VsException(DevMessageConstant.Common.AUTHORIZED);
                 }
             }
         } else {

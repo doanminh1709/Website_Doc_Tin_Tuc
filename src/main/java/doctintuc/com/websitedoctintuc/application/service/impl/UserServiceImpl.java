@@ -141,7 +141,11 @@ public class UserServiceImpl implements IUserService {
                 account.setId(id);
                 account.setCreateBy(findAccount.get().getCreateBy());
                 account.setLastModifiedBy(currentUser.getFullName());
-                account.setPassword(new BCryptPasswordEncoder().encode(accountDTO.getPassword()));
+                if(accountDTO.getPassword() == null) {
+                    account.setPassword(findAccount.get().getPassword());
+                }else{
+                    account.setPassword(new BCryptPasswordEncoder().encode(accountDTO.getPassword()));
+                }
                 return userRepository.save(account);
             } else {
                 throw new VsException(String.format(DevMessageConstant.Common.EXITS_USERNAME,
