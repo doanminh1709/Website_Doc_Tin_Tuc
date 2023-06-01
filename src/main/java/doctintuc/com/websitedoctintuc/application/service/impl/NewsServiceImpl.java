@@ -229,17 +229,14 @@ public class NewsServiceImpl implements INewsService {
                     CommonConstant.ClassName.NEWS_CLASS_NAME, request.getNewsId()));
         } else {
             News news = newsRepository.findById(request.getNewsId()).get();
-            if (!userRepository.existsById(request.getUserId())) {
-                news.setView(news.getView() + 1);
-                return news;
-            } else {
-                news.setView(news.getView() + 1);
+            if (userRepository.existsById(request.getUserId())) {
                 RatingKey ratingKey = new RatingKey(request.getUserId(), request.getNewsId());
                 User user = userRepository.findById(request.getUserId()).get();
                 UserNews userNews = new UserNews(ratingKey, user, news);
                 userNewsRepository.save(userNews);
-                return news;
             }
+            news.setView(news.getView() + 1);
+            return news;
         }
     }
 

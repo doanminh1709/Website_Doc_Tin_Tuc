@@ -50,7 +50,6 @@ public class News extends AbstractBase {
     @OneToMany(mappedBy = "news", fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     private List<Comment> comments;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     private Category category;

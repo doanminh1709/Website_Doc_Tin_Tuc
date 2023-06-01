@@ -11,6 +11,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UserNewsRequest {
     private int userId;
-
     private int newsId;
 }
