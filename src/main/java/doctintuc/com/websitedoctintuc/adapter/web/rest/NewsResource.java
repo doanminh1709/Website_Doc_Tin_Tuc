@@ -1,6 +1,5 @@
 package doctintuc.com.websitedoctintuc.adapter.web.rest;
 
-import doctintuc.com.websitedoctintuc.application.request.UserNewsRequest;
 import doctintuc.com.websitedoctintuc.domain.dto.NewsDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -84,10 +83,10 @@ public interface NewsResource {
     ResponseEntity<?> countRecordNews();
 
     @ApiOperation("Save news watched")
-    @PostMapping("/no-auth/save-news-watched")
-    ResponseEntity<?> saveNewsWatched(@RequestBody UserNewsRequest request);
+    @GetMapping("/no-auth/save-news-watched/{newsId}")
+    ResponseEntity<?> saveNewsWatched(@PathVariable int newsId ,HttpServletRequest request);
 
     @ApiOperation("Get all news watched")
-    @PostMapping("/user/get-all-news-watched")
-    ResponseEntity<?> getAllNewsWatched(@RequestBody UserNewsRequest request);
+    @GetMapping("/user/get-all-news-watched")
+    ResponseEntity<?> getAllNewsWatched(HttpServletRequest request);
 }

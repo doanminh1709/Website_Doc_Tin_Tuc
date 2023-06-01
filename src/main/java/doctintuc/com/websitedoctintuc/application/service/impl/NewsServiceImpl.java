@@ -7,7 +7,6 @@ import doctintuc.com.websitedoctintuc.application.repository.CategoryRepository;
 import doctintuc.com.websitedoctintuc.application.repository.NewsRepository;
 import doctintuc.com.websitedoctintuc.application.repository.UserNewsRepository;
 import doctintuc.com.websitedoctintuc.application.repository.UserRepository;
-import doctintuc.com.websitedoctintuc.application.request.UserNewsRequest;
 import doctintuc.com.websitedoctintuc.application.service.INewsService;
 import doctintuc.com.websitedoctintuc.config.exception.VsException;
 import doctintuc.com.websitedoctintuc.domain.dto.CustomNewDTO;
@@ -24,10 +23,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -223,33 +219,45 @@ public class NewsServiceImpl implements INewsService {
     }
 
     @Override
-    public News saveNewsWatched(UserNewsRequest request) {
-        if (!newsRepository.existsById(request.getNewsId())) {
+    public News saveNewsWatched(int newsId, HttpServletRequest request) {
+        if (!newsRepository.existsById(newsId)) {
             throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID,
-                    CommonConstant.ClassName.NEWS_CLASS_NAME, request.getNewsId()));
+                    CommonConstant.ClassName.NEWS_CLASS_NAME, newsId));
         } else {
-            News news = newsRepository.findById(request.getNewsId()).get();
-            if (userRepository.existsById(request.getUserId())) {
-                RatingKey ratingKey = new RatingKey(request.getUserId(), request.getNewsId());
-                User user = userRepository.findById(request.getUserId()).get();
-                UserNews userNews = new UserNews(ratingKey, user, news);
-                userNewsRepository.save(userNews);
+            String auth = request.getHeader("Authorization");
+            if (auth != null && auth.startsWith("Bearer ")) {
+
+                int idCurrentUser = userRepository.findByUsername(jwtUtils.getUserByToken(auth.substring(7))).getId();
+
+                News news = newsRepository.findById(newsId).get();
+                if (userRepository.existsById(newsId)) {
+                    RatingKey ratingKey = new RatingKey(idCurrentUser, newsId);
+                    User user = userRepository.findById(idCurrentUser).get();
+                    UserNews userNews = new UserNews(ratingKey, user, news);
+                    userNewsRepository.save(userNews);
+                }
+                news.setView(news.getView() + 1);
+                return news;
+            } else {
+                News news = newsRepository.findById(newsId).get();
+                news.setView(news.getView() + 1);
+                return news;
             }
-            news.setView(news.getView() + 1);
-            return news;
         }
     }
 
-    @Override
-    public List<News> getAllNewWatched(UserNewsRequest request) {
-        if (!newsRepository.existsById(request.getNewsId())) {
-            throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID,
-                    CommonConstant.ClassName.NEWS_CLASS_NAME, request.getNewsId()));
-        } else {
+        @Override
+        public List<News> getAllNewWatched (HttpServletRequest request){
+
+            String authToken = request.getHeader("Authorization").substring(7);
+            String username = jwtUtils.getUserByToken(authToken);
+            User user = userRepository.findByUsername(username);
+
+
             List<UserNews> userNews = userNewsRepository.findAll();
             List<News> listNews = new ArrayList<>();
             for (UserNews item : userNews) {
-                if (item.getUser().getId() == request.getUserId()) {
+                if (Objects.equals(item.getUser().getId(), user.getId())) {
                     News news = newsRepository.findById(item.getNews().getId()).get();
                     listNews.add(news);
                 }
@@ -261,4 +269,3 @@ public class NewsServiceImpl implements INewsService {
             }
         }
     }
-}

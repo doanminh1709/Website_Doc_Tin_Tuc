@@ -3,7 +3,6 @@ package doctintuc.com.websitedoctintuc.adapter.web.rest.impl;
 import doctintuc.com.websitedoctintuc.adapter.web.base.RestApiV1;
 import doctintuc.com.websitedoctintuc.adapter.web.base.VsResponseUtil;
 import doctintuc.com.websitedoctintuc.adapter.web.rest.NewsResource;
-import doctintuc.com.websitedoctintuc.application.request.UserNewsRequest;
 import doctintuc.com.websitedoctintuc.application.service.INewsService;
 import doctintuc.com.websitedoctintuc.domain.dto.NewsDTO;
 import lombok.RequiredArgsConstructor;
@@ -88,12 +87,12 @@ public class NewsResourceImpl implements NewsResource {
     }
 
     @Override
-    public ResponseEntity<?> saveNewsWatched(UserNewsRequest request) {
-        return VsResponseUtil.ok(newsService.saveNewsWatched(request));
+    public ResponseEntity<?> saveNewsWatched( int newsId , HttpServletRequest request){
+        return VsResponseUtil.ok(newsService.saveNewsWatched(newsId , request));
     }
 
     @Override
-    public ResponseEntity<?> getAllNewsWatched(UserNewsRequest request) {
+    public ResponseEntity<?> getAllNewsWatched(HttpServletRequest request){
         return VsResponseUtil.ok(newsService.getAllNewWatched(request));
     }
 }
