@@ -84,10 +84,10 @@ public interface NewsResource {
     ResponseEntity<?> countRecordNews();
 
     @ApiOperation("Save news watched")
-    @GetMapping("/no-auth/save-news-watched")
+    @PostMapping("/no-auth/save-news-watched")
     ResponseEntity<?> saveNewsWatched(@RequestBody UserNewsRequest request);
 
     @ApiOperation("Get all news watched")
-    @GetMapping("/user/get-all-news-watched")
+    @PostMapping("/user/get-all-news-watched")
     ResponseEntity<?> getAllNewsWatched(@RequestBody UserNewsRequest request);
 }
