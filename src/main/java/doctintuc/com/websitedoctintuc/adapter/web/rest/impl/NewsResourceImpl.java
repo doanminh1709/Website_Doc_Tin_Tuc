@@ -3,10 +3,13 @@ package doctintuc.com.websitedoctintuc.adapter.web.rest.impl;
 import doctintuc.com.websitedoctintuc.adapter.web.base.RestApiV1;
 import doctintuc.com.websitedoctintuc.adapter.web.base.VsResponseUtil;
 import doctintuc.com.websitedoctintuc.adapter.web.rest.NewsResource;
+import doctintuc.com.websitedoctintuc.application.request.UserNewsRequest;
 import doctintuc.com.websitedoctintuc.application.service.INewsService;
 import doctintuc.com.websitedoctintuc.domain.dto.NewsDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestApiV1
 @RequiredArgsConstructor
@@ -15,8 +18,8 @@ public class NewsResourceImpl implements NewsResource {
     private final INewsService newsService;
 
     @Override
-    public ResponseEntity<?> create(NewsDTO newsDTO) {
-        return VsResponseUtil.ok(newsService.create(newsDTO));
+    public ResponseEntity<?> create(NewsDTO newsDTO, HttpServletRequest request) {
+        return VsResponseUtil.ok(newsService.create(newsDTO, request));
     }
 
     @Override
@@ -25,8 +28,8 @@ public class NewsResourceImpl implements NewsResource {
     }
 
     @Override
-    public ResponseEntity<?> update(Integer id, NewsDTO newsDTO) {
-        return VsResponseUtil.ok(newsService.update(id, newsDTO));
+    public ResponseEntity<?> update(Integer id, NewsDTO newsDTO, HttpServletRequest request) {
+        return VsResponseUtil.ok(newsService.update(id, newsDTO, request));
     }
 
     @Override
@@ -82,5 +85,15 @@ public class NewsResourceImpl implements NewsResource {
     @Override
     public ResponseEntity<?> countRecordNews() {
         return VsResponseUtil.ok(newsService.countRecordNews());
+    }
+
+    @Override
+    public ResponseEntity<?> saveNewsWatched(UserNewsRequest request) {
+        return VsResponseUtil.ok(newsService.saveNewsWatched(request));
+    }
+
+    @Override
+    public ResponseEntity<?> getAllNewsWatched(UserNewsRequest request) {
+        return VsResponseUtil.ok(newsService.getAllNewWatched(request));
     }
 }

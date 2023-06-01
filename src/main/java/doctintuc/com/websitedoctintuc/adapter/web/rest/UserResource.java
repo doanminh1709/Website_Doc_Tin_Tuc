@@ -18,7 +18,11 @@ public interface UserResource {
 
     @ApiOperation(value = "Create new user")
     @PostMapping("/no-auth/create-user")
-    ResponseEntity<?> create(@RequestBody UserDTO userDTO);
+    ResponseEntity<?> create(@RequestBody UserDTO userDTO , HttpServletRequest request);
+
+    @ApiOperation(value = "Create new user by admin")
+    @PostMapping("/admin/create-user-by-admin")
+    ResponseEntity<?> createAccountByAdmin(@RequestBody UserDTO userDTO , HttpServletRequest request);
 
     @ApiOperation(value = "Get user by id")
     @GetMapping("/both/get-user/{id}")
@@ -26,7 +30,7 @@ public interface UserResource {
 
     @ApiOperation(value = "Update user")
     @PostMapping("/both/update-user/{id}")
-    ResponseEntity<?> update(@PathVariable Integer id, @RequestBody UserDTO userDTO);
+    ResponseEntity<?> update(@PathVariable Integer id, @RequestBody UserDTO userDTO , HttpServletRequest request);
 
     @ApiOperation(value = "Delete user by id")
     @PostMapping("/admin/delete-user/{id}")

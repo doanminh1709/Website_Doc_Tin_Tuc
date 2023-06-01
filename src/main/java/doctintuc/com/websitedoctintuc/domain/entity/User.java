@@ -18,6 +18,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -65,14 +66,6 @@ public class User extends AbstractBase {
     private String avatar;
 
     @JsonIgnore
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "user_news",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "news_id")
-    )
-    private List<News> news;
-
-    @JsonIgnore
     @OneToMany(mappedBy = "user",
             fetch = FetchType.EAGER,
             cascade = CascadeType.ALL)
@@ -82,4 +75,21 @@ public class User extends AbstractBase {
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     @JsonIgnoreProperties("users")
     private Role role;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User user)) return false;
+        return Objects.equals(fullName, user.fullName) && Objects.equals(username, user.username) &&
+                Objects.equals(password, user.password) && Objects.equals(email, user.email) &&
+                Objects.equals(birthday, user.birthday) && Objects.equals(gender, user.gender) &&
+                Objects.equals(phone, user.phone) && Objects.equals(address, user.address) &&
+                Objects.equals(avatar, user.avatar) && Objects.equals(comments, user.comments) &&
+                Objects.equals(role, user.role);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fullName, username, password, email, birthday, gender, phone, address, avatar, comments, role);
+    }
 }

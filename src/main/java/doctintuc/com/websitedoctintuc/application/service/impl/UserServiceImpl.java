@@ -48,10 +48,9 @@ public class UserServiceImpl implements IUserService {
     private final RoleRepository roleRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
-    private final GetPrincipal getPrincipal;
 
     @Override
-    public User create(UserDTO accountDTO) {
+    public User create(UserDTO accountDTO, HttpServletRequest request) {
         if (userRepository.existsByUsername(accountDTO.getUsername())) {
             throw new VsException(String.format(DevMessageConstant.Common.EXITS_USERNAME, accountDTO.getUsername()));
         }
@@ -66,14 +65,12 @@ public class UserServiceImpl implements IUserService {
             }
         }
         String createBy;
-        if (getPrincipal.getCurrentPrincipal() != null) {
-            if (getPrincipal.getCurrentPrincipal().equals(EnumRole.ROLE_ADMIN.toString())) {
-                createBy = CommonConstant.ROLE__ADMIN;
-            } else {
-                createBy = CommonConstant.ROLE_SUPER_ADMIN;
-            }
+        String auth = request.getHeader("Authorization");
+        if (auth != null && auth.startsWith("Bearer ")) {
+            User user = userRepository.findByUsername(jwtUtils.getUserByToken(auth.substring(7)));
+            createBy = user.getFullName();
         } else {
-            createBy = CommonConstant.ROLE_USER;
+            createBy = accountDTO.getFullName();
         }
         try {
             User account = new User();
@@ -87,6 +84,7 @@ public class UserServiceImpl implements IUserService {
             account.setAvatar(accountDTO.getAvatar());
             account.setBirthday(birthday);
             account.setCreateBy(createBy);
+            account.setLastModifiedBy(createBy);
             account.setPassword(new BCryptPasswordEncoder().encode(accountDTO.getPassword()));
             account.setRole(roleRepository.findRoleByRoleName(EnumRole.ROLE_USER));
 
@@ -108,7 +106,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public User update(int id, UserDTO accountDTO) {
+    public User update(int id, UserDTO accountDTO, HttpServletRequest request) {
         if (!userRepository.existsById(id)) {
             throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID,
                     CommonConstant.ClassName.USER_CLASS_NAME, id));
@@ -116,31 +114,27 @@ public class UserServiceImpl implements IUserService {
             Optional<User> findAccount = userRepository.findById(id);
             if (findAccount.get().getUsername().equals(accountDTO.getUsername()) ||
                     !userRepository.existsByUsername(accountDTO.getUsername())) {
-                String lastModifiedBy;
-                if (getPrincipal.getCurrentPrincipal() != null) {
-                    if (getPrincipal.getCurrentPrincipal().equals(EnumRole.ROLE_ADMIN.toString())) {
-                        lastModifiedBy = CommonConstant.ROLE__ADMIN;
-                    } else {
-                        lastModifiedBy = CommonConstant.ROLE_SUPER_ADMIN;
-                    }
-                } else {
-                    lastModifiedBy = CommonConstant.ROLE_USER;
-                }
+                User currentUser = userRepository.findByUsername(jwtUtils.
+                        getUserByToken(request.getHeader("Authorization").substring(7)));
+                SimpleDateFormat sdf = new SimpleDateFormat(CommonConstant.FORMAT_DATE_PATTERN);
                 Date birthday = null;
-                try {
-                    if (accountDTO.getBirthday() != null) {
-                        SimpleDateFormat sdf = new SimpleDateFormat(CommonConstant.FORMAT_DATE_PATTERN);
+                if (accountDTO.getBirthday() != null) {
+                    try {
                         birthday = sdf.parse(accountDTO.getBirthday());
+                    } catch (Exception e) {
+                        log.error(e.getMessage());
                     }
-                } catch (Exception e) {
-                    log.error(e.getMessage());
                 }
-                User account = modelMapper.map(accountDTO, User.class);
+                User account = new User();
+                account.setGender(accountDTO.getGender());
+                account.setAddress(accountDTO.getAddress());
+                account.setFullName(accountDTO.getFullName());
                 account.setBirthday(birthday);
+                account.setUsername(findAccount.get().getUsername());
                 account.setAvatar(accountDTO.getAvatar());
                 account.setId(id);
                 account.setCreateBy(findAccount.get().getCreateBy());
-                account.setLastModifiedBy(lastModifiedBy);
+                account.setLastModifiedBy(currentUser.getFullName());
                 account.setPassword(new BCryptPasswordEncoder().encode(accountDTO.getPassword()));
                 return userRepository.save(account);
             } else {
@@ -148,6 +142,7 @@ public class UserServiceImpl implements IUserService {
                         accountDTO.getUsername()));
             }
         }
+
     }
 
     @Override

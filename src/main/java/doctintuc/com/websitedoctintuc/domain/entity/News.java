@@ -12,6 +12,8 @@ import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.Objects;
+
 @Entity
 @Getter
 @Setter
@@ -45,7 +47,7 @@ public class News extends AbstractBase {
 
 
     @JsonIgnore
-    @OneToMany(mappedBy = "news", fetch = FetchType.EAGER, cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
+    @OneToMany(mappedBy = "news", fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     private List<Comment> comments;
 
     @JsonIgnore
@@ -70,5 +72,17 @@ public class News extends AbstractBase {
         this.description = description;
         this.thumbnail = thumbnail;
         this.view = view;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof News news)) return false;
+        return view == news.view && Objects.equals(title, news.title) && Objects.equals(content, news.content) && Objects.equals(author, news.author) && Objects.equals(description, news.description) && Objects.equals(thumbnail, news.thumbnail) && Objects.equals(comments, news.comments) && Objects.equals(category, news.category);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, content, author, description, thumbnail, view, comments, category);
     }
 }
