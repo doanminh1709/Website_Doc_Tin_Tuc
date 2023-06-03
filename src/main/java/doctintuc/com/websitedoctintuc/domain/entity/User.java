@@ -30,6 +30,7 @@ import java.util.Objects;
 public class User extends AbstractBase {
 
     @Column(name = "full_name")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String fullName;
 
 //    @NotEmpty(message = "Username must not be empty")
@@ -47,22 +48,28 @@ public class User extends AbstractBase {
 //    @Pattern(regexp = "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$",
 //            message = "Email is not format")
 //    @Column(name = "email", nullable = false)
+@JsonInclude(JsonInclude.Include.NON_NULL)
     private String email;
 
     @JsonFormat(pattern = CommonConstant.FORMAT_DATE_PATTERN)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @Column(name = "birthday")
     private Date birthday;
 
     @Column(name = "gender")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String gender;
 //    @Pattern(regexp = "^\\d{10}$", message = "Phone number must be 10 characters")
     @Column(name = "phone")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String phone;
 
     @Column(name = "address")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String address;
 
     @Column(name = "avatar")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String avatar;
 
     @JsonIgnore
@@ -71,10 +78,24 @@ public class User extends AbstractBase {
             cascade = CascadeType.ALL)
     private List<Comment> comments;
 
+
     @ManyToOne
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     @JsonIgnoreProperties("users")
     private Role role;
+
+
+    public User(String fullName, String email, Date birthday,
+                String gender, String phone, String address,
+                String avatar) {
+        this.fullName = fullName;
+        this.email = email;
+        this.birthday = birthday;
+        this.gender = gender;
+        this.phone = phone;
+        this.address = address;
+        this.avatar = avatar;
+    }
 
     @Override
     public boolean equals(Object o) {

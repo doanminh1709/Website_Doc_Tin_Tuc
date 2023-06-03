@@ -42,8 +42,8 @@ public class UserResourceImpl implements UserResource {
 
 
     @Override
-    public ResponseEntity<?> update(Integer id, UserDTO userDTO, HttpServletRequest request) {
-        return VsResponseUtil.ok(userService.update(id, userDTO, request));
+    public ResponseEntity<?> update(Integer userId , UserDTO userDTO, HttpServletRequest request) {
+        return VsResponseUtil.ok(userService.update(userId , userDTO, request));
     }
 
     @Override

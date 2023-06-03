@@ -15,7 +15,6 @@ import doctintuc.com.websitedoctintuc.domain.dto.UserDTO;
 import doctintuc.com.websitedoctintuc.domain.entity.User;
 import doctintuc.com.websitedoctintuc.domain.pagine.PaginateDTO;
 import lombok.AllArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
@@ -90,8 +89,7 @@ public class UserServiceImpl implements IUserService {
             account.setPassword(new BCryptPasswordEncoder().encode(accountDTO.getPassword()));
             if (flag) {
                 account.setRole(roleRepository.findRoleByRoleName(EnumRole.ROLE_ADMIN));
-            }
-            else {
+            } else {
                 account.setRole(roleRepository.findRoleByRoleName(EnumRole.ROLE_USER));
             }
             return userRepository.save(account);
@@ -112,47 +110,129 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public User update(int id, UserDTO accountDTO, HttpServletRequest request) {
-        if (!userRepository.existsById(id)) {
-            throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID,
-                    CommonConstant.ClassName.USER_CLASS_NAME, id));
+    public User update(Integer userId, UserDTO userDTO, HttpServletRequest request) {
+
+        if (userId != null) {
+            Optional<User> foundUser = userRepository.findById(userId);
+            if (!ObjectUtils.isEmpty(foundUser)) {
+                String auth = request.getHeader("Authorization");
+                if (auth != null && jwtUtils.validationToken(auth.substring(7))) {
+
+                    User currentUser = userRepository.findByUsername(jwtUtils.getUserByToken(auth.substring(7)));
+                    String authority = currentUser.getRole().getRoleName().toString();
+                    String fullName = userDTO.getFullName() != null ? userDTO.getFullName() : currentUser.getFullName();
+                    String email = userDTO.getEmail() != null ? userDTO.getEmail() : currentUser.getEmail();
+                    String phone = userDTO.getPhone() != null ? userDTO.getPhone() : currentUser.getPhone();
+                    String address = userDTO.getAddress() != null ? userDTO.getAddress() : currentUser.getAddress();
+                    String gender = userDTO.getGender() != null ? userDTO.getGender() : currentUser.getGender();
+                    String avatar = userDTO.getAvatar() != null ? userDTO.getAvatar() : currentUser.getAvatar();
+
+                    SimpleDateFormat sdf = new SimpleDateFormat(CommonConstant.FORMAT_DATE_PATTERN);
+                    Date birthday = null;
+                    if (userDTO.getBirthday() != null) {
+                        try {
+                            birthday = sdf.parse(userDTO.getBirthday());
+                        } catch (Exception e) {
+                            log.error(e.getMessage());
+                        }
+                    }
+                    if (birthday == null) birthday = currentUser.getBirthday();
+                    switch (authority) {
+                        case "ROLE_USER", "ROLE_ADMIN" -> {
+                            if (currentUser.getId().equals(userId)) {
+                                User user = new User(fullName, email, birthday, gender, phone, address, avatar);
+                                user.setUsername(currentUser.getUsername());
+                                user.setId(currentUser.getId());
+                                user.setCreateBy(currentUser.getCreateBy());
+                                user.setPassword(currentUser.getPassword());
+                                user.setRole(currentUser.getRole());
+                                user.setLastModifiedBy(currentUser.getFullName());
+                                return userRepository.save(user);
+                            } else {
+                                throw new VsException(DevMessageConstant.Common.AUTHORIZED);
+                            }
+                        }
+                        case "ROLE_SUPER_ADMIN" -> {
+                            if (currentUser.getId().equals(userId)) {
+                                User user = new User(fullName, email, birthday, gender, phone, address, avatar);
+                                user.setUsername(currentUser.getUsername());
+                                user.setId(currentUser.getId());
+                                user.setCreateBy(currentUser.getCreateBy());
+                                user.setPassword(currentUser.getPassword());
+                                user.setRole(currentUser.getRole());
+                                user.setLastModifiedBy(currentUser.getFullName());
+                                return userRepository.save(user);
+                            } else {
+                                if (currentUser.getRole().getRoleName().toString()
+                                        .equals(foundUser.get().getRole().getRoleName().toString())) {
+                                    throw new VsException(DevMessageConstant.Common.AUTHORIZED);
+                                } else {
+                                    Date birthdayUpdate = null;
+                                    if (userDTO.getBirthday() != null) {
+                                        try {
+                                            birthdayUpdate = sdf.parse(userDTO.getBirthday());
+                                        } catch (Exception e) {
+                                            log.error(e.getMessage());
+                                        }
+                                    }
+                                    if (birthdayUpdate == null) birthdayUpdate = foundUser.get().getBirthday();
+                                    String fullNameUpdate = userDTO.getFullName() != null ? userDTO.getFullName() : foundUser.get().getFullName();
+                                    String emailUpdate = userDTO.getEmail() != null ? userDTO.getEmail() : foundUser.get().getEmail();
+                                    String phoneUpdate = userDTO.getPhone() != null ? userDTO.getPhone() : foundUser.get().getPhone();
+                                    String addressUpdate = userDTO.getAddress() != null ? userDTO.getAddress() : foundUser.get().getAddress();
+                                    String genderUpdate = userDTO.getGender() != null ? userDTO.getGender() : foundUser.get().getGender();
+                                    String avatarUpdate = userDTO.getAvatar() != null ? userDTO.getAvatar() : foundUser.get().getAvatar();
+                                    User user = new User(fullNameUpdate, emailUpdate, birthdayUpdate,
+                                            genderUpdate, phoneUpdate, addressUpdate, avatarUpdate);
+                                    user.setUsername(foundUser.get().getUsername());
+                                    user.setId(foundUser.get().getId());
+                                    user.setCreateBy(foundUser.get().getCreateBy());
+                                    user.setPassword(foundUser.get().getPassword());
+                                    user.setRole(foundUser.get().getRole());
+                                    user.setLastModifiedBy(currentUser.getFullName());
+                                    return userRepository.save(user);
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    throw new VsException(DevMessageConstant.Common.TOKEN_INVALID);
+                }
+            } else {
+                throw new VsException(String.format(DevMessageConstant.Common.NOT_FOUND_OBJECT_BY_ID,
+                        CommonConstant.ClassName.USER_CLASS_NAME, userId));
+            }
         } else {
-            Optional<User> findAccount = userRepository.findById(id);
-            if (findAccount.get().getUsername().equals(accountDTO.getUsername()) ||
-                    !userRepository.existsByUsername(accountDTO.getUsername())) {
-                User currentUser = userRepository.findByUsername(jwtUtils.
-                        getUserByToken(request.getHeader("Authorization").substring(7)));
+            String auth = request.getHeader("Authorization");
+            if (auth != null && jwtUtils.validationToken(auth.substring(7))) {
+                User currentUser = userRepository.findByUsername(jwtUtils.getUserByToken(auth.substring(7)));
+                String fullName = userDTO.getFullName() != null ? userDTO.getFullName() : currentUser.getFullName();
+                String email = userDTO.getEmail() != null ? userDTO.getEmail() : currentUser.getEmail();
+                String phone = userDTO.getPhone() != null ? userDTO.getPhone() : currentUser.getPhone();
+                String address = userDTO.getAddress() != null ? userDTO.getAddress() : currentUser.getAddress();
+                String gender = userDTO.getGender() != null ? userDTO.getGender() : currentUser.getGender();
+                String avatar = userDTO.getAvatar() != null ? userDTO.getAvatar() : currentUser.getAvatar();
+
                 SimpleDateFormat sdf = new SimpleDateFormat(CommonConstant.FORMAT_DATE_PATTERN);
                 Date birthday = null;
-                if (accountDTO.getBirthday() != null) {
+                if (userDTO.getBirthday() != null) {
                     try {
-                        birthday = sdf.parse(accountDTO.getBirthday());
+                        birthday = sdf.parse(userDTO.getBirthday());
                     } catch (Exception e) {
                         log.error(e.getMessage());
                     }
                 }
-                User account = new User();
-                account.setGender(accountDTO.getGender());
-                account.setAddress(accountDTO.getAddress());
-                account.setFullName(accountDTO.getFullName());
-                account.setBirthday(birthday);
-                account.setUsername(findAccount.get().getUsername());
-                account.setAvatar(accountDTO.getAvatar());
-                account.setId(id);
-                account.setCreateBy(findAccount.get().getCreateBy());
-                account.setLastModifiedBy(currentUser.getFullName());
-                if(accountDTO.getPassword() == null) {
-                    account.setPassword(findAccount.get().getPassword());
-                }else{
-                    account.setPassword(new BCryptPasswordEncoder().encode(accountDTO.getPassword()));
-                }
-                return userRepository.save(account);
-            } else {
-                throw new VsException(String.format(DevMessageConstant.Common.EXITS_USERNAME,
-                        accountDTO.getUsername()));
+                if (birthday == null) birthday = currentUser.getBirthday();
+                User user = new User(fullName, email, birthday, gender, phone, address, avatar);
+                user.setUsername(currentUser.getUsername());
+                user.setId(currentUser.getId());
+                user.setCreateBy(currentUser.getCreateBy());
+                user.setPassword(currentUser.getPassword());
+                user.setRole(currentUser.getRole());
+                return userRepository.save(user);
             }
         }
-
+        return null;
     }
 
     @Override

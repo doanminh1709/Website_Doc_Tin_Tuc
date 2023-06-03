@@ -18,7 +18,7 @@ public class JwtUtils {
     private static String secretKey="Password12345@";
 
 //    @Value("${jwt.time}")
-    private static Long dueTime = 180000L;
+    private static Long dueTime=6000000L;
 
 
     public String generateTokenByUsername(String username) {

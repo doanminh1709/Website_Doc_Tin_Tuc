@@ -5,6 +5,7 @@ import doctintuc.com.websitedoctintuc.application.response.UserResponse;
 import doctintuc.com.websitedoctintuc.domain.dto.UserDTO;
 import doctintuc.com.websitedoctintuc.domain.entity.User;
 import doctintuc.com.websitedoctintuc.domain.pagine.PaginateDTO;
+import io.swagger.models.auth.In;
 import org.springframework.security.core.Authentication;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,11 +13,11 @@ import javax.servlet.http.HttpServletResponse;
 
 public interface IUserService {
 
-    User create(UserDTO accountDTO , HttpServletRequest request);
+    User create(UserDTO accountDTO, HttpServletRequest request);
 
     User get(int id);
 
-    User update(int id, UserDTO accountDTO , HttpServletRequest request);
+    User update(Integer userId , UserDTO accountDTO, HttpServletRequest request);
 
     String delete(int id);
 
